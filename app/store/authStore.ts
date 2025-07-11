@@ -19,7 +19,7 @@ export const useAuthStore = create<AuthState>()(
                     user: {
                         id:0,
                         username:"",                        
-                        role:"",
+                        rol:"",
                         access_token:""    
                     },
                     accessToken: "",

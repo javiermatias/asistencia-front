@@ -6,7 +6,7 @@ import { JWT } from "next-auth/jwt"
 interface User {
   id: number;
   username: string;
-  role: string;
+  rol: string;
   access_token: string;
 }
 
@@ -24,7 +24,7 @@ declare module "next-auth/jwt" {
     user: {
       id: number;
       username: string;
-      role: string;  
+      rol: string;  
     };
     accessToken: string;
   }
@@ -45,9 +45,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           if (!credentials?.username || !credentials.password) {
             return null;
           }
+
+          console.log("hola" + process.env.NEXT_PUBLIC_API_URL)
   
-          // Call our mock API to authenticate the user
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/login`, {
+          // Call our mock API to authenticate the user(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/login`
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

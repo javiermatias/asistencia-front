@@ -16,7 +16,7 @@ export default async function AdminPage() {
           Welcome, <span className="font-semibold">{session?.user?.username}</span>!
         </p>
         <p className="text-gray-600">
-          Your role is: <span className="font-mono text-blue-600">{session?.user?.role}</span>
+          Your role is: <span className="font-mono text-blue-600">{session?.user?.rol}</span>
         </p>
         <div className="p-4 mt-4 text-left bg-gray-100 rounded">
           <h3 className="font-semibold">Your Backend JWT:</h3>
