@@ -8,28 +8,20 @@ export const authConfig = {
         authorized({ auth, request }) {
             console.log("autorizando")
             const isLoggedIn = !!auth?.user;
-            const isAgente = request.nextUrl.pathname.startsWith('/agente');
-            const isSupervisor = request.nextUrl.pathname.startsWith('/supervisor');
-            const register = request.nextUrl.pathname.startsWith('/register');
+            const urlAgente = request.nextUrl.pathname.startsWith('/agente');
+            const urlSupervisor = request.nextUrl.pathname.startsWith('/supervisor');
+            const urlAdmin = request.nextUrl.pathname.startsWith('/admin');
             const login = request.nextUrl.pathname.startsWith('/login');
-            if (register) return true;
-            if (login && !isLoggedIn) return true;
             if (!isLoggedIn) return false;
-            if (isSupervisor) {
-                if (isLoggedIn && auth?.user?.role === 'supervisor') return true;
-                return false; // Redirect unauthenticated users to login page
-            }/*  else if (isLoggedIn && auth?.user?.email === 'moi@moi.com') {
-                return Response.redirect(new URL('/supervisor/dashboard', request.nextUrl));
-            } */
-
-            if (isAgente) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
-            } else if (isLoggedIn) {
-                return Response.redirect(new URL('/agente/dashboard', request.nextUrl));
-            }
-
+            if (login && isLoggedIn) return true;
+            if (urlAgente && auth?.user?.role === 'agente') return true;
+            if (urlSupervisor && auth?.user?.role === 'supervisor') return true;
+            if (urlAdmin && auth?.user?.role === 'admin') return true;
+            
             return false;
+            
+            
+          
 
 
 

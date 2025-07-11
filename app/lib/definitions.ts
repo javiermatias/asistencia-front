@@ -91,16 +91,13 @@ export type Accion = {
   fecha: string;
 }
 
-export type User = {
-  id: string;
-  nombre: string; //nombreColaborador
-  email: string;
-  password: string;
+export interface User {
+  id: number;
+  nombre: string;
+  apellido: string;
   role: string;
-  numero: string;
-  posicion: string; //posicionColaborador;
-  proyecto: string; //proyectoPerteneces
-};
+  access_token: string;
+}
 
 export type Customer = {
   id: string;

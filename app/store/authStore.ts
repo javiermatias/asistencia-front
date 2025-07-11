@@ -16,6 +16,13 @@ export const useAuthStore = create<AuthState>()(
         persist(
             (set) => ({
                 session: {
+                    user: {
+                        id:0,
+                        username:"",                        
+                        role:"",
+                        access_token:""    
+                    },
+                    accessToken: "",
                     expires: ""
                 },
                 setSession: (session) => { set({ session }) }, // Update the state with the new incidencia object
@@ -27,21 +34,7 @@ export const useAuthStore = create<AuthState>()(
         )
     )
 )
-/* 
-export type Bitacora = {
-  //semana: string;
-  asunto: string;
-  nombre: string; //nombreColaborador
-  fecha: string;
-  lugar: string;
-  convocado: string;//convocadoPor
-  id_user: number; //id usuario
-  id_despacho: string; //id despacho
-  nombre_despacho: string; //nombre despacho
-  nombre_atiende: string; //nombre atiende
-  cargo_atiende: string; //cargo de quein atiende
 
-} */
 
 export const useBitacoraStore = create<BitacoraState>()(
     devtools(

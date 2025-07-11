@@ -1,74 +1,78 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
-import { z } from 'zod';
-import { sql } from '@vercel/postgres';
-import type { User } from '@/app/lib/definitions';
-
 import { JWT } from "next-auth/jwt"
 
+interface User {
+  id: number;
+  username: string;
+  role: string;
+  access_token: string;
+}
+
 // Extend the built-in session and user types to include our custom properties
-declare module 'next-auth' {
+declare module "next-auth" {
+  
   interface Session {
-    user: {
-      role: 'supervisor' | 'agent';
-      backendToken: string;
-    } & User; // an intersection type with the default User
+    user: User;
+    accessToken: string;
   }
-
 }
 
-declare module 'next-auth/jwt' {
+declare module "next-auth/jwt" {
   interface JWT {
-    role: 'supervisor' | 'agent';
-    backendToken: string;
+    user: {
+      id: number;
+      username: string;
+      role: string;  
+    };
+    accessToken: string;
   }
 }
 
-async function getUser(email: string): Promise<User | undefined> {
- /*    try {
-        const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
-        return user.rows[0];
-    } catch (error) {
-        console.error('Failed to fetch user:', error);
-        throw new Error('Failed to fetch user.');
-    } */
-        return {
-            id: "0",
-    nombre: "javi",
-    email: "javi@javi.com",
-    password: "123456",
-    role: "agente",
-    numero: "23232323",
-    posicion: "nada",
-    proyecto: "string",
-          };
 
-
-
-}
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
-        Credentials({
-            async authorize(credentials) {
-                const parsedCredentials = z
-                    .object({ email: z.string().email(), password: z.string().min(6) })
-                    .safeParse(credentials);
-
-                if (parsedCredentials.success) {
-                    const { email, password } = parsedCredentials.data;
-                    const user = await getUser(email);
-                    if (!user) return null;
-                    return user;
-                    //const passwordsMatch = password === user.password;
-                    //if (passwordsMatch) return user;
-                }
-
-                return null;
+      Credentials({
+        // You can specify which fields should be submitted, but we'll define them in the login form instead
+        credentials: {
+          username: { label: "Username" },
+          password: { label: "Password", type: "password" },
+        },
+        async authorize(credentials) {
+          if (!credentials?.username || !credentials.password) {
+            return null;
+          }
+  
+          // Call our mock API to authenticate the user
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
             },
-        }),
+            body: JSON.stringify({
+              username: credentials.username,
+              password: credentials.password,
+            }),
+          });
+  
+          if (!res.ok) {
+            return null; // Authentication failed
+          }
+  
+          const user = await res.json();
+          
+          // If no user is returned, authentication failed
+          if (!user) {
+            return null;
+          }
+  
+          // The user object returned here will be passed to the `jwt` callback
+          return user;
+        },
+      }),
     ],
     callbacks: {
         // Ref: https://authjs.dev/guides/basics/role-based-access-control#persisting-the-role
@@ -88,9 +92,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         async session({ session, token }) {
 
 
+       
             session.user = token as any
             return session
         },
+    },
+    pages: {
+      signIn: "/login", // Redirect users to our custom login page
     },
 });
 
