@@ -7,8 +7,10 @@ export const authConfig = {
     },
     callbacks: {
         authorized({ auth, request }) {
+
+            return true;
            
-            const { nextUrl } = request;
+           /*  const { nextUrl } = request;
             const isLoggedIn = !!auth?.user;
             const userRole = auth?.user?.rol; // Ensure 'rol' is consistently used
 
@@ -56,7 +58,7 @@ export const authConfig = {
 
             // Default: If none of the above rules matched, deny access.
             console.log("  -> Default: Denying access.");
-            return false;
+            return false; */
 
         },
     },
