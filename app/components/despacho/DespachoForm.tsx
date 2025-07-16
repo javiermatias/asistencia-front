@@ -1,11 +1,7 @@
-"use client";
-
-import { useState, useEffect, FormEvent } from 'react';
-
-// Import the CSS module
 import styles from './DespachoCrud.module.css';
 import { Despacho } from '@/app/types/despacho';
 import { useAddDespacho, useUpdateDespacho } from '@/app/hooks/despacho/useDespachos';
+import { FormEvent, useEffect, useState } from 'react';
 
 interface DespachoFormProps {
   initialData?: Despacho | null;
@@ -17,6 +13,7 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
   const [nombre, setNombre] = useState('');
   const [latitud, setLatitud] = useState('');
   const [longitud, setLongitud] = useState('');
+  const [geoError, setGeoError] = useState<string | null>(null);
 
   const addDespachoMutation = useAddDespacho();
   const updateDespachoMutation = useUpdateDespacho();
@@ -28,6 +25,25 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
       setLongitud(String(initialData.longitud));
     }
   }, [initialData]);
+
+  const handleGetCoordinates = () => {
+    if (!navigator.geolocation) {
+      setGeoError('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitud(position.coords.latitude.toFixed(6));
+        setLongitud(position.coords.longitude.toFixed(6));
+        setGeoError(null);
+      },
+      (error) => {
+        setGeoError('Unable to retrieve your location.');
+        console.error(error);
+      }
+    );
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -52,17 +68,18 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
 
   return (
     <form onSubmit={handleSubmit} className={styles.formContainer}>
-      <h2 className={styles.subtitle}>{initialData ? 'Edit Despacho' : 'Add Despacho'}</h2>
-      
-      {/* Display error message from the mutation */}
+      <h2 className={styles.subtitle}>{initialData ? 'Editar Despacho' : 'Agregar despacho'}</h2>
+
       {mutation.isError && (
         <div className={styles.errorText}>
           Error: {mutation.error.response?.data as string || mutation.error.message}
         </div>
       )}
 
+      {geoError && <div className={styles.errorText}>⚠️ {geoError}</div>}
+
       <div className={styles.formGroup}>
-        <label htmlFor="nombre_despacho">Despacho Name</label>
+        <label htmlFor="nombre_despacho">Nombre Despacho</label>
         <input
           id="nombre_despacho"
           type="text"
@@ -71,8 +88,9 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
           required
         />
       </div>
+
       <div className={styles.formGroup}>
-        <label htmlFor="latitud">Latitude</label>
+        <label htmlFor="latitud">Latitud</label>
         <input
           id="latitud"
           type="number"
@@ -82,8 +100,9 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
           required
         />
       </div>
+
       <div className={styles.formGroup}>
-        <label htmlFor="longitud">Longitude</label>
+        <label htmlFor="longitud">Longitud</label>
         <input
           id="longitud"
           type="number"
@@ -93,12 +112,16 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
           required
         />
       </div>
+
       <div className={styles.formActions}>
         <button type="submit" disabled={isLoading} className={styles.button}>
-          {isLoading ? 'Saving...' : 'Save'}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </button>
         <button type="button" onClick={onCancel} className={styles.button}>
-          Cancel
+          Cancelar
+        </button>
+        <button type="button" onClick={handleGetCoordinates} className={`${styles.button} ${styles.getCoordinatesButton}`}>
+          Obtener Coordenadas
         </button>
       </div>
     </form>

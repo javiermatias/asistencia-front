@@ -57,7 +57,7 @@ export default function DespachoPage() {
   
   return (
     <main className={styles.container}>
-      <h1 className={styles.title}>Despacho Management</h1>
+      <h1 className={styles.title}>Administrar Despachos</h1>
       
       {/* Display global errors (like delete error) */}
       {globalError && <div className={styles.errorText}>{globalError}</div>}

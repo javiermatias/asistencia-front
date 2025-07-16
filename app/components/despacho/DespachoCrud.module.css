@@ -78,6 +78,14 @@
     background-color: #bdc3c7;
     cursor: not-allowed;
   }
+
+  .getCoordinatesButton {
+    background-color: #2ecc71; /* green, for example */
+  }
+  
+  .getCoordinatesButton:hover {
+    background-color: #27ae60;
+  }
   
   .buttonAdd {
     margin-bottom: 20px;

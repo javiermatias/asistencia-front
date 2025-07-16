@@ -8,8 +8,10 @@ export default async function AdminPage() {
   const session = await auth();
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-blue-50">
+    <section className="pt-16 p-2">
+      <div className="container mx-auto px-2">
             <DespachoPage></DespachoPage>
-    </main>
+       </div>
+    </section>
   );
 }
