@@ -1,6 +1,6 @@
 export interface Despacho {
     id: string;
-    nombre_despacho: string;
+    nombre: string;
     latitud: number;
     longitud: number;
   }

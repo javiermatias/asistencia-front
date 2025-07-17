@@ -1,10 +1,46 @@
 'use client'
-import { signOut } from "next-auth/react";
-import { useFormStatus } from "react-dom";
+import {  useSession } from "next-auth/react";
+import { useAuthStore } from "./store/authStore";
+import { useEffect } from "react";
+import { redirect } from "next/navigation";
+import Spinner from "./ui/spiner";
+
 
 
 export default function Page() {
-  const { pending } = useFormStatus(); // Get pending state if used within a form
+
+  const { data: session } = useSession()
+  const token = session?.user.access_token
+
+  const { setSession } = useAuthStore()
+  useEffect(() => {
+    if (token) {
+      console.log("homepage session", session)
+      setSession(session)
+      switch (session?.user.role) {
+        case "admin": { redirect('/admin') }
+        case "supervisor": { redirect('/supervisor') }
+        case "agente": { redirect('/agente') }
+        
+      }
+    }
+
+  }, [session, setSession, token])
+
+
+  return (
+    <main className="flex flex-col items-center justify-center h-screen">
+      <p className="mb-4 text-center">Ingresando, aguarde un momento</p>
+      <Spinner></Spinner>
+    </main>
+  )
+
+
+
+
+
+
+  /* const { pending } = useFormStatus(); // Get pending state if used within a form
   return (
     <>
 
@@ -26,7 +62,7 @@ export default function Page() {
 
 
     </>
-  );
+  ); */
 }
 
 

@@ -6,6 +6,7 @@ import { auth } from '@/auth';
 
 export default async function AdminPage() {
   const session = await auth();
+  console.log(session);
 
   return (
     <section className="pt-16 p-2">

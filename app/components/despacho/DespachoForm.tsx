@@ -1,4 +1,4 @@
-import styles from './DespachoCrud.module.css';
+
 import { Despacho } from '@/app/types/despacho';
 import { useAddDespacho, useUpdateDespacho } from '@/app/hooks/despacho/useDespachos';
 import { FormEvent, useEffect, useState } from 'react';
@@ -14,13 +14,14 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
   const [latitud, setLatitud] = useState('');
   const [longitud, setLongitud] = useState('');
   const [geoError, setGeoError] = useState<string | null>(null);
+  const token = '';
 
-  const addDespachoMutation = useAddDespacho();
-  const updateDespachoMutation = useUpdateDespacho();
+  const addDespachoMutation = useAddDespacho(token );
+  const updateDespachoMutation = useUpdateDespacho(token );
 
   useEffect(() => {
     if (initialData) {
-      setNombre(initialData.nombre_despacho);
+      setNombre(initialData.nombre);
       setLatitud(String(initialData.latitud));
       setLongitud(String(initialData.longitud));
     }
@@ -48,49 +49,69 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const despachoData = {
-      nombre_despacho: nombre,
+      nombre: nombre,
       latitud: parseFloat(latitud),
       longitud: parseFloat(longitud),
+      
     };
 
     if (initialData) {
       updateDespachoMutation.mutate(
-        { id: initialData.id, ...despachoData },
+        {
+          despacho: { id: initialData.id, ...despachoData },
+          token,
+        },
         { onSuccess }
       );
     } else {
-      addDespachoMutation.mutate(despachoData, { onSuccess });
-    }
-  };
+      addDespachoMutation.mutate(
+        {
+          despacho: despachoData,
+          token,
+        },
+        { onSuccess }
+      );
+    }  };
 
   const mutation = initialData ? updateDespachoMutation : addDespachoMutation;
   const isLoading = mutation.isPending;
 
   return (
-    <form onSubmit={handleSubmit} className={styles.formContainer}>
-      <h2 className={styles.subtitle}>{initialData ? 'Editar Despacho' : 'Agregar despacho'}</h2>
-
+    <form onSubmit={handleSubmit} className="p-5 border border-gray-300 rounded-lg mb-6 bg-gray-50">
+      <h2 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2 mb-4">
+        {initialData ? 'Editar Despacho' : 'Agregar despacho'}
+      </h2>
+  
       {mutation.isError && (
-        <div className={styles.errorText}>
+        <div className="mb-4 text-red-700 bg-red-100 border border-red-400 p-3 rounded">
           Error: {mutation.error.response?.data as string || mutation.error.message}
         </div>
       )}
-
-      {geoError && <div className={styles.errorText}>⚠️ {geoError}</div>}
-
-      <div className={styles.formGroup}>
-        <label htmlFor="nombre_despacho">Nombre Despacho</label>
+  
+      {geoError && (
+        <div className="mb-4 text-red-700 bg-red-100 border border-red-400 p-3 rounded">
+          ⚠️ {geoError}
+        </div>
+      )}
+  
+      <div className="mb-4">
+        <label htmlFor="nombre_despacho" className="block mb-1 font-medium text-gray-700">
+          Nombre Despacho
+        </label>
         <input
           id="nombre_despacho"
           type="text"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           required
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-
-      <div className={styles.formGroup}>
-        <label htmlFor="latitud">Latitud</label>
+  
+      <div className="mb-4">
+        <label htmlFor="latitud" className="block mb-1 font-medium text-gray-700">
+          Latitud
+        </label>
         <input
           id="latitud"
           type="number"
@@ -98,11 +119,14 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
           value={latitud}
           onChange={(e) => setLatitud(e.target.value)}
           required
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-
-      <div className={styles.formGroup}>
-        <label htmlFor="longitud">Longitud</label>
+  
+      <div className="mb-4">
+        <label htmlFor="longitud" className="block mb-1 font-medium text-gray-700">
+          Longitud
+        </label>
         <input
           id="longitud"
           type="number"
@@ -110,17 +134,36 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
           value={longitud}
           onChange={(e) => setLongitud(e.target.value)}
           required
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-
-      <div className={styles.formActions}>
-        <button type="submit" disabled={isLoading} className={styles.button}>
+  
+      <div className="flex gap-3 mt-6">
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`px-4 py-2 rounded text-white transition ${
+            isLoading
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-600'
+          }`}
+        >
           {isLoading ? 'Guardando...' : 'Guardar'}
         </button>
-        <button type="button" onClick={onCancel} className={styles.button}>
+  
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 rounded text-white bg-gray-500 hover:bg-gray-600 transition"
+        >
           Cancelar
         </button>
-        <button type="button" onClick={handleGetCoordinates} className={`${styles.button} ${styles.getCoordinatesButton}`}>
+  
+        <button
+          type="button"
+          onClick={handleGetCoordinates}
+          className="px-4 py-2 rounded text-white bg-green-500 hover:bg-green-600 transition"
+        >
           Obtener Coordenadas
         </button>
       </div>

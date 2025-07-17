@@ -6,7 +6,7 @@ import { JWT } from "next-auth/jwt"
 interface User {
   id: number;
   username: string;
-  rol: string;
+  role: string;
   access_token: string;
 }
 
@@ -14,8 +14,13 @@ interface User {
 declare module "next-auth" {
   
   interface Session {
-    user: User;
-    accessToken: string;
+    user: {
+      id: number;
+      username: string;
+      role: string;
+      access_token: string;
+    };
+    
   }
 }
 
@@ -46,10 +51,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             return null;
           }
 
-          console.log("hola" + process.env.NEXT_PUBLIC_API_URL)
+          //console.log("hola" + process.env.NEXT_PUBLIC_API_URL)
   
           // Call our mock API to authenticate the user(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/login`
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -80,22 +85,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         // Ref: https://authjs.dev/guides/basics/role-based-access-control#persisting-the-role
         async jwt({ token, user }) {
 
-            /* if (user) {
-                const backendUser = user as BackendUser;
-                token.role = backendUser.role;
-                token.backendToken = backendUser.backendToken;
-              }
-              return token; */
-            //console.log(token);
-            console.log(token, user);
+           
+            console.log("jwt token",token);
+            console.log("jwt user",user);
+           
             return { ...token, ...user }
         },
         // If you want to use the role in client components
         async session({ session, token }) {
 
-
-       
+            // Send properties to the client, like an access_token from a provider.
+            console.log("session auth:", session)
+            console.log("token auth:", token)
             session.user = token as any
+            console.log("session user:", session.user)
             return session
         },
     },

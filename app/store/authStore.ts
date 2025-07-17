@@ -19,11 +19,11 @@ export const useAuthStore = create<AuthState>()(
                     user: {
                         id:0,
                         username:"",                        
-                        rol:"",
+                        role:"",
                         access_token:""    
                     },
-                    accessToken: "",
-                    expires: ""
+                    expires:""
+                
                 },
                 setSession: (session) => { set({ session }) }, // Update the state with the new incidencia object
 

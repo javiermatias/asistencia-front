@@ -2,61 +2,91 @@
 
 import { Despacho } from '@/app/types/despacho';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios'; // Import AxiosError for better typing
+import axios, { AxiosError } from 'axios';
 
-const API_URL = '/api/despachos';
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/despacho`;
 
-// --- API Functions using Axios ---
+// --- API Functions with token ---
 
-const fetchDespachos = async (): Promise<Despacho[]> => {
-  const { data } = await axios.get(API_URL);
+const fetchDespachos = async (token: string): Promise<Despacho[]> => {
+  const { data } = await axios.get(API_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return data;
 };
 
-const addDespacho = async (newDespacho: Omit<Despacho, 'id'>): Promise<Despacho> => {
-  const { data } = await axios.post(API_URL, newDespacho);
+const addDespacho = async ({
+  despacho,
+  token,
+}: {
+  despacho: Omit<Despacho, 'id'>;
+  token: string;
+}): Promise<Despacho> => {
+  const { data } = await axios.post(API_URL, despacho, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return data;
 };
 
-const updateDespacho = async (updatedDespacho: Despacho): Promise<Despacho> => {
-  const { data } = await axios.put(`${API_URL}/${updatedDespacho.id}`, updatedDespacho);
+const updateDespacho = async ({
+  despacho,
+  token,
+}: {
+  despacho: Despacho;
+  token: string;
+}): Promise<Despacho> => {
+  const { data } = await axios.put(`${API_URL}/${despacho.id}`, despacho, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return data;
 };
 
-const deleteDespacho = async (id: string): Promise<void> => {
-  await axios.delete(`${API_URL}/${id}`);
+const deleteDespacho = async ({
+  id,
+  token,
+}: {
+  id: string;
+  token: string;
+}): Promise<void> => {
+  await axios.delete(`${API_URL}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 // --- React Query Hooks ---
 
-// Hook to get all despachos
-export const useGetDespachos = () => {
+export const useGetDespachos = (token: string) => {
   return useQuery<Despacho[], Error>({
     queryKey: ['despachos'],
-    queryFn: fetchDespachos,
+    queryFn: () => fetchDespachos(token),
+    enabled: !!token, // only run if token is available
   });
 };
 
-// Hook to add a despacho
-export const useAddDespacho = () => {
+export const useAddDespacho = (token: string) => {
   const queryClient = useQueryClient();
-  return useMutation<Despacho, AxiosError, Omit<Despacho, 'id'>>({
+  return useMutation<Despacho, AxiosError, { despacho: Omit<Despacho, 'id'>; token: string }>({
     mutationFn: addDespacho,
     onSuccess: () => {
-      // Invalidate and refetch the 'despachos' query to show the new data
       queryClient.invalidateQueries({ queryKey: ['despachos'] });
     },
     onError: (error) => {
-      // Centralized error logging
       console.error("Error adding despacho:", error.response?.data || error.message);
     },
   });
 };
 
-// Hook to update a despacho
-export const useUpdateDespacho = () => {
+export const useUpdateDespacho = (token: string) => {
   const queryClient = useQueryClient();
-  return useMutation<Despacho, AxiosError, Despacho>({
+  return useMutation<Despacho, AxiosError, { despacho: Despacho; token: string }>({
     mutationFn: updateDespacho,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['despachos'] });
@@ -67,10 +97,9 @@ export const useUpdateDespacho = () => {
   });
 };
 
-// Hook to delete a despacho
-export const useDeleteDespacho = () => {
+export const useDeleteDespacho = (token: string) => {
   const queryClient = useQueryClient();
-  return useMutation<void, AxiosError, string>({
+  return useMutation<void, AxiosError, { id: string; token: string }>({
     mutationFn: deleteDespacho,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['despachos'] });
