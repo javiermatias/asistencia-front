@@ -10,7 +10,8 @@ import Spinner from "./ui/spiner";
 export default function Page() {
 
   const { data: session } = useSession()
-  const token = session?.user.access_token
+  const token = session?.user?.access_token
+  console.log("session",session)
 
   const { setSession } = useAuthStore()
   useEffect(() => {

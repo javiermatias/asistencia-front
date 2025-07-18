@@ -2,6 +2,7 @@
 import { Despacho } from '@/app/types/despacho';
 import { useAddDespacho, useUpdateDespacho } from '@/app/hooks/despacho/useDespachos';
 import { FormEvent, useEffect, useState } from 'react';
+import { useAuthStore } from '@/app/store/authStore';
 
 interface DespachoFormProps {
   initialData?: Despacho | null;
@@ -14,10 +15,12 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
   const [latitud, setLatitud] = useState('');
   const [longitud, setLongitud] = useState('');
   const [geoError, setGeoError] = useState<string | null>(null);
-  const token = '';
+  const { session } = useAuthStore()
+  const token = session?.user.access_token;
 
-  const addDespachoMutation = useAddDespacho(token );
-  const updateDespachoMutation = useUpdateDespacho(token );
+  const addDespachoMutation = useAddDespacho(token);
+  const updateDespachoMutation = useUpdateDespacho(token);
+  
 
   useEffect(() => {
     if (initialData) {
@@ -42,6 +45,7 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
       (error) => {
         setGeoError('Unable to retrieve your location.');
         console.error(error);
+        
       }
     );
   };

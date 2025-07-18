@@ -92,7 +92,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             // Send properties to the client, like an access_token from a provider.
             console.log("session auth:", session)
             console.log("token auth:", token)
-            session.user.name = token.role as any
+            session.user = token as any
         
             console.log("session user:", session.user)
             return session

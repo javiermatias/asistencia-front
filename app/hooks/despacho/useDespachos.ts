@@ -39,7 +39,7 @@ const updateDespacho = async ({
   despacho: Despacho;
   token: string;
 }): Promise<Despacho> => {
-  const { data } = await axios.put(`${API_URL}/${despacho.id}`, despacho, {
+  const { data } = await axios.patch(`${API_URL}/${despacho.id}`, despacho, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
