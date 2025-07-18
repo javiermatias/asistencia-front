@@ -13,8 +13,8 @@ import { NextResponse } from 'next/server';
 // Por simplicidad en este ejemplo, lo redefinimos, pero no funcionará entre archivos.
 // LA FORMA CORRECTA está comentada. Para que este ejemplo funcione sin más archivos, lo dejamos así:
 let despachos: Despacho[] = [
-  { id: '1', nombre_despacho: 'Oficina Central', latitud: 40.416775, longitud: -3.703790 },
-  { id: '2', nombre_despacho: 'Almacén Norte', latitud: 40.463667, longitud: -3.749220 },
+  { id: '1', nombre: 'Oficina Central', latitud: 40.416775, longitud: -3.703790 },
+  { id: '2', nombre: 'Almacén Norte', latitud: 40.463667, longitud: -3.749220 },
 ];
 // NOTA: Debido a cómo Next.js hace hot-reloading, la data en memoria se reiniciará con cada cambio de código.
 

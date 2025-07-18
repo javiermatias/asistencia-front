@@ -112,7 +112,7 @@ export default function DespachoPage() {
                       onClick={() => handleEditClick(despacho)}
                       className="px-3 py-1 rounded text-white bg-blue-500 hover:bg-blue-600 transition"
                     >
-                      Edit
+                      Editar
                     </button>
                     <button
                       onClick={() => handleDeleteClick(despacho.id)}

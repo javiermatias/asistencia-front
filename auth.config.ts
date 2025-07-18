@@ -6,10 +6,11 @@ export const authConfig = {
     },
     callbacks: {
         authorized({ auth, request }) {
-            return true;
+            //return true;
 
-        /*     const isLoggedIn = !!auth?.user;
+            const isLoggedIn = !!auth?.user;
             console.log("middleware",auth )
+           //console.log("request",request);
             const urlAgente = request.nextUrl.pathname.startsWith('/agente');
             const urlSupervisor = request.nextUrl.pathname.startsWith('/supervisor');
             const urlAdmin = request.nextUrl.pathname.startsWith('/admin');
@@ -20,7 +21,7 @@ export const authConfig = {
             if (urlSupervisor && auth?.user?.role === 'supervisor') return true;
             if (urlAdmin && auth?.user?.role === 'admin') return true;
 
-            return false; */
+            return false; 
 
         },
     },
