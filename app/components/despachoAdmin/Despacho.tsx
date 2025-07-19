@@ -7,6 +7,7 @@ import { useDeleteDespacho, useGetDespachos } from '@/app/hooks/despacho/useDesp
 import DespachoForm from './DespachoForm';
 import { useAuthStore } from '@/app/store/authStore';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 export default function DespachoPage() {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -31,20 +32,44 @@ export default function DespachoPage() {
   };
 
   const handleDeleteClick = (id: string) => {
-    
-    if (window.confirm('¿Estás seguro de que quieres eliminar este despacho?')) { // Updated confirmation text
-      deleteMutation.mutate( { id, token:session?.user.access_token }, {
-        onError: (error) => {
-          const errorMessage = error.response?.data as string || "Ocurrió un error desconocido."; // Updated error message
-          setGlobalError(`Falló la eliminación del despacho. El servidor dice: ${errorMessage}`); // Updated error message
-          toast.error('¡Hubo un error al eliminar el despacho!');
-        },
-        onSuccess: () => {
-          toast.success('¡Se eliminó correctamente!'); // Changed to toast.success for positive feedback
-          setGlobalError(null); // Clear error on success
-        }
-      });
-    }
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¡No podrás revertir esta acción!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, ¡elimínalo!',
+      cancelButtonText: 'Cancelar', // Optional: Custom text for the cancel button
+    // 👇 This is the magic part
+     customClass: {
+     confirmButton: 'my-swal-confirm-button', // Class for the confirm button
+     cancelButton: 'my-swal-cancel-button'   // Class for the cancel button
+  }
+    }).then((result) => {
+      // This code runs AFTER the user clicks a button
+      if (result.isConfirmed) {
+        // If the user clicked "Sí, ¡elimínalo!"
+        deleteMutation.mutate({ id, token: session?.user.access_token }, {
+          onError: (error) => {
+            // Keep your original error handling logic
+            const errorMessage = (error as any).response?.data as string || "Ocurrió un error desconocido.";
+            setGlobalError(`Falló la eliminación del despacho. El servidor dice: ${errorMessage}`);
+            toast.error('¡Hubo un error al eliminar el despacho!');
+          },
+          onSuccess: () => {
+            // On success, show another alert or toast
+            Swal.fire(
+              '¡Eliminado!',
+              'El despacho ha sido eliminado correctamente.',
+              'success'
+            );
+            // toast.success('¡Se eliminó correctamente!'); // You can use this instead of the Swal.fire if you prefer
+            setGlobalError(null);
+          }
+        });
+      }
+    });
   };
 
   const handleFormSuccess = () => {

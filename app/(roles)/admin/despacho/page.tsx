@@ -1,5 +1,5 @@
 // app/supervisor/page.tsx
-import DespachoPage from '@/app/components/despacho/Despacho';
+import DespachoPage from '@/app/components/despachoAdmin/Despacho';
 import { auth } from '@/auth';
 
 

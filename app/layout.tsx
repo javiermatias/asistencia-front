@@ -3,6 +3,7 @@ import { inter } from '@/app/ui/fonts';
 import AuthWrapper from './auth_wrapper';
 import TanstackProvider from './tanstack_provider';
 import { ToastContainer } from 'react-toastify'
+//import 'sweetalert2/src/sweetalert2.scss';
 export default function RootLayout({
   children,
 }: {
