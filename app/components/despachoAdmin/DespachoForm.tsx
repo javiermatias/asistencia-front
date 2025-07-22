@@ -19,7 +19,7 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
   const token = session?.user.access_token;
 
   const addDespachoMutation = useAddDespacho(token);
-  const updateDespachoMutation = useUpdateDespacho(token);
+  const updateDespachoMutation = useUpdateDespacho();
   
 
   useEffect(() => {

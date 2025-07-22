@@ -13,8 +13,8 @@ import { NextResponse } from 'next/server';
 // Por simplicidad en este ejemplo, lo redefinimos, pero no funcionará entre archivos.
 // LA FORMA CORRECTA está comentada. Para que este ejemplo funcione sin más archivos, lo dejamos así:
 let despachos: Despacho[] = [
-  { id: '1', nombre: 'Oficina Central', latitud: 40.416775, longitud: -3.703790 },
-  { id: '2', nombre: 'Almacén Norte', latitud: 40.463667, longitud: -3.749220 },
+  { id: 1, nombre: 'Oficina Central', latitud: 40.416775, longitud: -3.703790 },
+  { id: 2, nombre: 'Almacén Norte', latitud: 40.463667, longitud: -3.749220 },
 ];
 // NOTA: Debido a cómo Next.js hace hot-reloading, la data en memoria se reiniciará con cada cambio de código.
 
@@ -25,7 +25,7 @@ interface Params {
 // PUT /api/despachos/[id] - Actualizar un despacho
 export async function PUT(request: Request, { params }: Params) {
   const { id } = params;
-  const index = despachos.findIndex(d => d.id === id);
+  const index = despachos.findIndex(d => d.id === Number(id));
 
   if (index === -1) {
     return new NextResponse('Despacho no encontrado', { status: 404 });
@@ -44,7 +44,7 @@ export async function PUT(request: Request, { params }: Params) {
 export async function DELETE(request: Request, { params }: Params) {
   const { id } = params;
   const initialLength = despachos.length;
-  despachos = despachos.filter(d => d.id !== id);
+  despachos = despachos.filter(d => d.id !== Number(id));
 
   if (despachos.length === initialLength) {
     return new NextResponse('Despacho no encontrado', { status: 404 });

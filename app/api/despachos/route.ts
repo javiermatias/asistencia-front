@@ -4,8 +4,8 @@ import { NextResponse } from 'next/server';
 
 // Simulamos una base de datos en memoria
 let despachos: Despacho[] = [
-  { id: '1', nombre: 'Oficina Central', latitud: 40.416775, longitud: -3.703790 },
-  { id: '2', nombre: 'Almacén Norte', latitud: 40.463667, longitud: -3.749220 },
+  { id: 0, nombre: 'Oficina Central', latitud: 40.416775, longitud: -3.703790 },
+  { id: 1, nombre: 'Almacén Norte', latitud: 40.463667, longitud: -3.749220 },
 ];
 
 // GET /api/despachos - Obtener todos los despachos
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     }
 
     const newDespacho: Despacho = {
-      id: crypto.randomUUID(), // Genera un ID único
+      id: 0, // Genera un ID único
       nombre,
       latitud: Number(latitud),
       longitud: Number(longitud),

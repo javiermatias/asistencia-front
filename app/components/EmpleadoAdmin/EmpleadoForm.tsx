@@ -22,7 +22,7 @@ const EmpleadoForm = ({ onSuccess, onCancel }: EmpleadoFormProps) => {
   const { session } = useAuthStore();
   const token = session?.user.access_token;
 
-  const addEmpleadoMutation = useAddEmpleado(token);
+  const addEmpleadoMutation = useAddEmpleado();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

@@ -17,7 +17,7 @@ export default function DespachoPage() {
   const token = session?.user.access_token;
   
   const { data: despachos, isLoading, isError, error } = useGetDespachos(token);
-  const deleteMutation = useDeleteDespacho(token);
+  const deleteMutation = useDeleteDespacho();
 
   const handleAddClick = () => {
     setEditingDespacho(null);
@@ -146,7 +146,7 @@ export default function DespachoPage() {
                         Editar
                       </button>
                       <button
-                        onClick={() => handleDeleteClick(despacho.id)}
+                        onClick={() => handleDeleteClick(despacho.id.toString())}
                         className={`px-3 py-1 rounded text-white transition ${
                           deleteMutation.isPending 
                             ? 'bg-gray-400 cursor-not-allowed'

@@ -84,7 +84,7 @@ export const useAddDespacho = (token: string) => {
   });
 };
 
-export const useUpdateDespacho = (token: string) => {
+export const useUpdateDespacho = () => {
   const queryClient = useQueryClient();
   return useMutation<Despacho, AxiosError, { despacho: Despacho; token: string }>({
     mutationFn: updateDespacho,
@@ -97,7 +97,7 @@ export const useUpdateDespacho = (token: string) => {
   });
 };
 
-export const useDeleteDespacho = (token: string) => {
+export const useDeleteDespacho = () => {
   const queryClient = useQueryClient();
   return useMutation<void, AxiosError, { id: string; token: string }>({
     mutationFn: deleteDespacho,

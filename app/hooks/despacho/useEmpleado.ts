@@ -6,14 +6,31 @@ import { EmpleadoDTO } from "@/app/types/empleado/ver-empleado";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 
+export interface PaginatedEmpleadosResponse {
+  data: EmpleadoDTO[];
+  count: number;
+  total: number;
+  page: number;
+  pageCount: number;
+}
+
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/empleado`;
 
 // --- API Functions with token ---
 
-const fetchEmpleados = async (token: string): Promise<EmpleadoDTO[]> => {
+const fetchEmpleados = async (
+  token: string, 
+  page: number, 
+  limit: number
+): Promise<PaginatedEmpleadosResponse> => {
   const { data } = await axios.get(API_URL, {
     headers: {
       Authorization: `Bearer ${token}`,
+    },
+    // Pass pagination parameters to the API
+    params: {
+      page,
+      limit,
     },
   });
   return data;
@@ -65,15 +82,21 @@ const deleteEmpleado = async ({
 
 // --- React Query Hooks ---
 
-export const useGetEmpleados = (token: string) => {
-  return useQuery<EmpleadoDTO[], Error>({
-    queryKey: ["empleados"],
-    queryFn: () => fetchEmpleados(token),
+// --- Custom Hook to GET Empleados ---
+export const useGetEmpleados = (token: string | undefined, page: number, limit: number) => {
+  return useQuery<PaginatedEmpleadosResponse, Error>({
+    // The query key is an array that uniquely identifies this data.
+    // When page or limit changes, React Query will refetch automatically.
+    queryKey: ['empleados', page, limit],
+    queryFn: () => fetchEmpleados(token!, page, limit),
+    // Only run the query if the token exists
     enabled: !!token,
+    // Optional: Keep previous data visible while new data is loading
+    //keepPreviousData: true, 
   });
 };
 
-export const useAddEmpleado = (token: string) => {
+export const useAddEmpleado = () => {
   const queryClient = useQueryClient();
   return useMutation<
     EmpleadoDTO,
@@ -90,7 +113,7 @@ export const useAddEmpleado = (token: string) => {
   });
 };
 
-export const useUpdateEmpleado = (token: string) => {
+export const useUpdateEmpleado = () => {
   const queryClient = useQueryClient();
   return useMutation<
     EmpleadoDTO,

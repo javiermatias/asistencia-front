@@ -1,3 +1,5 @@
+import { Despacho, Puesto } from "../despacho";
+
 export interface EmpleadoDTO {
     id:string;
     numero_empleado: string;
@@ -6,16 +8,8 @@ export interface EmpleadoDTO {
     sexo: 'Masculino' | 'Femenino' | 'Otro';
     
     baja:boolean;
-    puesto: string;
-    despacho: string;
+    puesto: Puesto;
+    despacho: Despacho;
     es_supervisor?: boolean;
   }
 
-/*   "id": 2,
-  "numero_empleado": "EMP12345sd",
-  "nombre": "Juan",
-  "apellido": "Pérez",
-  "sexo": "Masculino",
-  "baja": false,
-  "baja_date": null,
-  "es_supervisor": false */
