@@ -55,7 +55,7 @@ const updateEmpleado = async ({
   empleado,
   token,
 }: {
-  empleado: UpdateEmpleadoDTO & { id: string };
+  empleado: CreateEmpleadoDTO & { id: string };
   token: string;
 }): Promise<EmpleadoDTO> => {
   const { data } = await axios.patch(`${API_URL}/${empleado.id}`, empleado, {
@@ -118,7 +118,7 @@ export const useUpdateEmpleado = () => {
   return useMutation<
     EmpleadoDTO,
     AxiosError,
-    { empleado: UpdateEmpleadoDTO & { id: string }; token: string }
+    { empleado: CreateEmpleadoDTO & { id: string }; token: string }
   >({
     mutationFn: updateEmpleado,
     onSuccess: () => {
@@ -130,7 +130,7 @@ export const useUpdateEmpleado = () => {
   });
 };
 
-export const useDeleteEmpleado = (token: string) => {
+export const useDeleteEmpleado = () => {
   const queryClient = useQueryClient();
   return useMutation<void, AxiosError, { id: string; token: string }>({
     mutationFn: deleteEmpleado,
@@ -142,3 +142,19 @@ export const useDeleteEmpleado = (token: string) => {
     },
   });
 };
+
+
+
+// Define the types for the data you expect from the API
+export interface Puesto {
+  id: number;
+  nombre: string;
+}
+
+export interface Despacho {
+  id: number;
+  nombre: string;
+}
+
+// Hook to fetch Puestos
+// Hook to fetch Despachos

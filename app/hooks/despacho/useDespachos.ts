@@ -1,10 +1,11 @@
 "use client";
 
-import { Despacho } from '@/app/types/despacho';
+import { Despacho, Puesto } from '@/app/types/despacho';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/despacho`;
+const API_PUESTO = `${process.env.NEXT_PUBLIC_API_URL}/puesto`;
 
 // --- API Functions with token ---
 
@@ -107,5 +108,23 @@ export const useDeleteDespacho = () => {
     onError: (error) => {
       console.error("Error deleting despacho:", error.response?.data || error.message);
     },
+  });
+};
+
+
+const fetchPuestos = async (token: string): Promise<Puesto[]> => {
+  const { data } = await axios.get(API_PUESTO, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return data;
+};
+
+export const useGetPuestos = (token: string) => {
+  return useQuery<Puesto[], Error>({
+    queryKey: ['puestos'],
+    queryFn: () => fetchPuestos(token),
+    enabled: !!token, // only run if token is available
   });
 };

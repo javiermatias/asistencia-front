@@ -5,15 +5,16 @@ import { useAuthStore } from '@/app/store/authStore';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // For pagination icons
-import EmpleadoForm from './EmpleadoForm'; // Assuming you will create this form component later
 import { useDeleteEmpleado, useGetEmpleados } from '@/app/hooks/despacho/useEmpleado';
-import { EmpleadoDTO } from '@/app/types/empleado/ver-empleado';
+import EmpleadoForm from './EmpleadoForm';
+import { CreateEmpleadoDTO } from '@/app/types/empleado/create-empleado';
 
 export default function EmpleadoPage() {
   // --- State Management ---
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [editingEmpleado, setEditingEmpleado] = useState<EmpleadoDTO | null>(null);
+  const [editingEmpleado, setEditingEmpleado] = useState<CreateEmpleadoDTO| null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState(''); // New state for search
 
   // Pagination State
   const [page, setPage] = useState(1);
@@ -24,13 +25,19 @@ export default function EmpleadoPage() {
   const token = session?.user.access_token;
 
   const { data: paginatedData, isLoading, isError, error } = useGetEmpleados(token, page, rowsPerPage);
-  const deleteMutation = useDeleteEmpleado(token);
+  const deleteMutation = useDeleteEmpleado();
 
 
   // Extract data and pagination details
   const empleados = paginatedData?.data ?? [];
   const totalPages = paginatedData?.pageCount ?? 1;
   const totalRows = paginatedData?.total ?? 0;
+
+  // --- Filtered Data ---
+  const filteredEmpleados = empleados.filter(empleado =>
+    empleado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    empleado.apellido.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // --- Handlers ---
   const handleAddClick = () => {
@@ -39,7 +46,7 @@ export default function EmpleadoPage() {
     setGlobalError(null);
   };
 
-  const handleEditClick = (empleado: EmpleadoDTO) => {
+  const handleEditClick = (empleado: CreateEmpleadoDTO) => {
     setEditingEmpleado(empleado);
     setIsFormVisible(true);
     setGlobalError(null);
@@ -122,19 +129,31 @@ export default function EmpleadoPage() {
       )}
 
       {!isFormVisible ? (
-        <button
-          onClick={handleAddClick}
-          className="mt-6 mb-4 px-4 py-2 rounded text-white bg-green-500 hover:bg-green-600 transition"
-        >
-          Agregar Empleado
-        </button>
+        // --- Controls Section: Add Button and Search Box ---
+        <div className="mt-6 mb-4 flex justify-between items-center">
+            <button
+              onClick={handleAddClick}
+              className="px-4 py-2 rounded text-white bg-green-500 hover:bg-green-600 transition"
+            >
+              Agregar Empleado
+            </button>
+            <input 
+              type="text"
+              placeholder="Buscar por nombre o apellido..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+        </div>
       ) : (
-        <></>
-      /*   <EmpleadoForm
+        <>
+        <EmpleadoForm
           initialData={editingEmpleado}
           onSuccess={handleFormSuccess}
           onCancel={handleFormCancel}
-        /> */
+        /> 
+        </> // Placeholder for the form
+         
       )}
 
       {/* Conditionally render the table and pagination */}
@@ -149,7 +168,7 @@ export default function EmpleadoPage() {
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Puesto</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Despacho</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Sexo</th>
-                <th className="p-3 text-center text-sm font-semibold text-gray-600 border-b">Supervisor</th>
+                {/* <th className="p-3 text-center text-sm font-semibold text-gray-600 border-b">Supervisor</th> */}
                 <th className="p-3 text-center text-sm font-semibold text-gray-600 border-b">Activo</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Acciones</th>
               </tr>
@@ -159,8 +178,8 @@ export default function EmpleadoPage() {
                  <tr>
                     <td colSpan={9} className="text-center p-4">Cargando...</td>
                  </tr>
-              ) : empleados.length > 0 ? (
-                empleados.map((empleado) => (
+              ) : filteredEmpleados.length > 0 ? (
+                filteredEmpleados.map((empleado) => (
                   <tr key={empleado.id} className="hover:bg-gray-50">
                     <td className="p-3 border-b text-sm">{empleado.numero_empleado}</td>
                     <td className="p-3 border-b text-sm">{empleado.nombre}</td>
@@ -181,7 +200,16 @@ export default function EmpleadoPage() {
                     <td className="p-3 border-b">
                       <div className="flex gap-2">
                         <button
-                          onClick={() => handleEditClick(empleado)}
+                          onClick={() => handleEditClick({
+                            //id: Number(empleado.id),
+                            numero_empleado: empleado.numero_empleado,
+                            nombre: empleado.nombre,
+                            apellido: empleado.apellido,
+                            sexo: empleado.sexo,
+                            puesto: empleado.puesto?.id ?? 0,       // fallback in case puesto is undefined
+                            despacho: empleado.despacho?.id ?? 0,   // fallback in case despacho is undefined
+                            es_supervisor: empleado.es_supervisor
+                          })}
                           className="px-3 py-1 rounded text-white bg-blue-500 hover:bg-blue-600 transition text-sm"
                         >
                           Editar
@@ -204,7 +232,7 @@ export default function EmpleadoPage() {
               ) : (
                 <tr>
                   <td colSpan={9} className="text-center text-gray-500 p-4">
-                    No se encontraron empleados.
+                    {empleados.length > 0 ? 'No se encontraron resultados para su búsqueda.' : 'No se encontraron empleados.'}
                   </td>
                 </tr>
               )}
