@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuthStore } from '@/app/store/authStore';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // For pagination icons
+import { FaChevronLeft, FaChevronRight, FaEdit, FaTable, FaTimes, FaTrash } from 'react-icons/fa'; // For pagination icons
 import { useDeleteEmpleado, useGetEmpleados } from '@/app/hooks/despacho/useEmpleado';
 import EmpleadoForm from './EmpleadoForm';
 import { CreateEmpleadoDTO } from '@/app/types/empleado/create-empleado';
@@ -82,7 +82,11 @@ export default function EmpleadoPage() {
   const handleFormSuccess = () => {
     setIsFormVisible(false);
     setEditingEmpleado(null);
-    toast.success(editingEmpleado ? '¡Empleado actualizado!' : '¡Empleado agregado!');
+    Swal.fire({
+      title: "Empleado agregado",
+      text: "Se agrego el empleado correctamente",
+      timer: 2000
+    })
   };
 
   const handleFormCancel = () => {
@@ -187,18 +191,18 @@ export default function EmpleadoPage() {
                     <td className="p-3 border-b text-sm">{empleado.puesto?.nombre ?? 'N/A'}</td>
                     <td className="p-3 border-b text-sm">{empleado.despacho?.nombre ?? 'N/A'}</td>
                     <td className="p-3 border-b text-sm">{empleado.sexo}</td>
-                    <td className="p-3 border-b text-sm text-center">
+              {/*       <td className="p-3 border-b text-sm text-center">
                       <span className={`px-2 py-1 text-xs rounded-full ${empleado.es_supervisor ? 'bg-blue-100 text-blue-800' : 'bg-gray-200 text-gray-800'}`}>
                          {empleado.es_supervisor ? 'Sí' : 'No'}
                       </span>
-                    </td>
+                    </td> */}
                     <td className="p-3 border-b text-sm text-center">
                        <span className={`px-2 py-1 text-xs rounded-full ${!empleado.baja ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                          {!empleado.baja ? 'Sí' : 'No'}
                       </span>
                     </td>
                     <td className="p-3 border-b">
-                      <div className="flex gap-2">
+                      <div className="flex gap-3">
                         <button
                           onClick={() => handleEditClick({
                             //id: Number(empleado.id),
@@ -212,8 +216,23 @@ export default function EmpleadoPage() {
                           })}
                           className="px-3 py-1 rounded text-white bg-blue-500 hover:bg-blue-600 transition text-sm"
                         >
-                          Editar
+                          <FaEdit/>
                         </button>
+
+                        <button
+                          onClick={() => handleDeleteClick(empleado.id.toString())}
+                          className={`px-3 py-1 rounded text-white transition text-sm ${
+                            deleteMutation.isPending
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-green-500 hover:bg-red-600'
+                          }`}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <FaTable/>
+                        </button>
+
+
+
                         <button
                           onClick={() => handleDeleteClick(empleado.id.toString())}
                           className={`px-3 py-1 rounded text-white transition text-sm ${
@@ -223,9 +242,16 @@ export default function EmpleadoPage() {
                           }`}
                           disabled={deleteMutation.isPending}
                         >
-                          {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
+                          <FaTrash/>
                         </button>
+
+                     
                       </div>
+
+
+
+
+
                     </td>
                   </tr>
                 ))

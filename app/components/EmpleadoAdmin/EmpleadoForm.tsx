@@ -128,8 +128,9 @@ const EmpleadoForm = ({ initialData, onSuccess, onCancel }: EmpleadoFormProps) =
         </select>
       </div>
 
+
       {/* Supervisor Checkbox
-      <div className="mb-4 flex items-center"><input id="esSupervisor" type="checkbox" checked={esSupervisor} onChange={(e) => setEsSupervisor(e.target.checked)} className="mr-2 h-4 w-4"/><label htmlFor="esSupervisor" className="text-gray-700">Es supervisor</label></div> 
+      
       */}
       
 
