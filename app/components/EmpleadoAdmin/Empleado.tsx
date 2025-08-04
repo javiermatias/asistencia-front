@@ -8,14 +8,14 @@ import { FaChevronLeft, FaChevronRight, FaEdit, FaTable, FaTimes, FaTrash } from
 import { useDeleteEmpleado, useGetEmpleados } from '@/app/hooks/despacho/useEmpleado';
 import EmpleadoForm from './EmpleadoForm';
 import { CreateEmpleadoDTO } from '@/app/types/empleado/create-empleado';
-
+import { useRouter } from 'next/navigation'; 
 export default function EmpleadoPage() {
   // --- State Management ---
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingEmpleado, setEditingEmpleado] = useState<CreateEmpleadoDTO| null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState(''); // New state for search
-
+  const router = useRouter();
   // Pagination State
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(100); // Default 100 rows
@@ -220,16 +220,15 @@ export default function EmpleadoPage() {
                         </button>
 
                         <button
-                          onClick={() => handleDeleteClick(empleado.id.toString())}
-                          className={`px-3 py-1 rounded text-white transition text-sm ${
-                            deleteMutation.isPending
-                              ? 'bg-gray-400 cursor-not-allowed'
-                              : 'bg-green-500 hover:bg-red-600'
-                          }`}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <FaTable/>
-                        </button>
+                           onClick={() => router.push(`/admin/horario/${empleado.id}`)}
+                         className={`px-3 py-1 rounded text-white transition text-sm ${
+                         deleteMutation.isPending ? 'bg-gray-400 cursor-not-allowed'
+      : 'bg-green-500 hover:bg-red-600' // Green turning red is unusual for an edit button
+  }`}
+  disabled={deleteMutation.isPending}
+>
+  <FaTable/>
+</button>
 
 
 

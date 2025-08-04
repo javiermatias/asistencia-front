@@ -1,96 +1,148 @@
 .container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
-    font-family: sans-serif;
-  }
-  
-  .title {
-    text-align: center;
-    color: #333;
-  }
-  
-  .scheduleGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-  
-  .dayCard {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1rem;
-    text-align: center;
-    background-color: #f9f9f9;
-    transition: box-shadow 0.2s;
-  }
-  
-  .dayCard:hover {
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  
-  .dayCard h3 {
-    margin-top: 0;
-    color: #555;
-  }
-  
-  .select {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    font-size: 1rem;
-    background-color: white;
-  }
-  
-  .actions {
-    margin-top: 2rem;
-    text-align: center;
-  }
-  
-  .saveButton {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    color: white;
-    background-color: #0070f3;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .saveButton:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .saveButton:hover:not(:disabled) {
-    background-color: #005bb5;
-  }
-  
-  .message {
-      margin-top: 1rem;
-      font-weight: bold;
-      text-align: center;
-      padding: 0.5rem;
-      border-radius: 4px;
-  }
-  
-  .errorMessage {
-    composes: message;
-    color: #D8000C;
-    background-color: #FFD2D2;
-  }
-  
-  .successMessage {
-    composes: message;
-    color: #270;
-    background-color: #DFF2BF;
-  }
-  
-  .loadingMessage {
-      text-align: center;
-      font-size: 1.2rem;
-      color: #555;
-  }
+  padding: 2rem;
+  max-width: 800px;
+  margin: 2rem auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 1rem;
+}
+
+/* Table Styles */
+.tableContainer {
+  overflow-x: auto; /* Ensures table is scrollable on small screens */
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.scheduleTable {
+  width: 100%;
+  border-collapse: collapse; /* Essential for clean borders */
+  font-size: 1rem;
+  color: #495057;
+}
+
+.scheduleTable th,
+.scheduleTable td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* Table Header */
+.scheduleTable thead tr {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.scheduleTable th {
+  font-weight: 600;
+  color: #343a40;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+/* Table Body */
+.scheduleTable tbody tr {
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.scheduleTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.scheduleTable tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+/* Select Dropdown in Table */
+.select {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.select:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.select:disabled {
+  background-color: #e9ecef;
+  opacity: 0.7;
+}
+
+/* Actions & Buttons */
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.saveButton {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+.saveButton:hover:not(:disabled) {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.saveButton:disabled {
+  background-color: #a0c3e6;
+  cursor: not-allowed;
+}
+
+/* Feedback Messages */
+.loadingMessage,
+.errorMessage,
+.successMessage {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  font-weight: 500;
+}
+
+.loadingMessage {
+  color: #17a2b8;
+  background-color: #e2f6f9;
+}
+
+.errorMessage {
+  color: #dc3545;
+  background-color: #f8d7da;
+}
+
+.successMessage {
+  color: #28a745;
+  background-color: #d4edda;
+}
