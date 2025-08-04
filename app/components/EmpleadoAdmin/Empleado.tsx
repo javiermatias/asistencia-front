@@ -4,21 +4,27 @@ import { useState } from 'react';
 import { useAuthStore } from '@/app/store/authStore';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import { FaChevronLeft, FaChevronRight, FaEdit, FaTable, FaTimes, FaTrash } from 'react-icons/fa'; // For pagination icons
+import { FaChevronLeft, FaChevronRight, FaEdit, FaTable, FaTrash } from 'react-icons/fa';
 import { useDeleteEmpleado, useGetEmpleados } from '@/app/hooks/despacho/useEmpleado';
+// NEW: Import the hook to get all despachos
+
 import EmpleadoForm from './EmpleadoForm';
 import { CreateEmpleadoDTO } from '@/app/types/empleado/create-empleado';
 import { useRouter } from 'next/navigation'; 
+import { useGetDespachos } from '@/app/hooks/despacho/useDespachos';
+
 export default function EmpleadoPage() {
   // --- State Management ---
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [editingEmpleado, setEditingEmpleado] = useState<CreateEmpleadoDTO| null>(null);
+  const [editingEmpleado, setEditingEmpleado] = useState<CreateEmpleadoDTO | null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState(''); // New state for search
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDespacho, setSelectedDespacho] = useState<string>(''); // NEW: State for the despacho filter
   const router = useRouter();
+
   // Pagination State
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(100); // Default 100 rows
+  const [rowsPerPage, setRowsPerPage] = useState(100);
 
   // --- Auth and Data Fetching ---
   const { session } = useAuthStore();
@@ -26,20 +32,31 @@ export default function EmpleadoPage() {
 
   const { data: paginatedData, isLoading, isError, error } = useGetEmpleados(token, page, rowsPerPage);
   const deleteMutation = useDeleteEmpleado();
-
+  
+  // NEW: Fetch all despachos for the filter dropdown
+  const { data: allDespachos, isLoading: isLoadingDespachos } = useGetDespachos(token);
 
   // Extract data and pagination details
   const empleados = paginatedData?.data ?? [];
   const totalPages = paginatedData?.pageCount ?? 1;
   const totalRows = paginatedData?.total ?? 0;
 
-  // --- Filtered Data ---
-  const filteredEmpleados = empleados.filter(empleado =>
-    empleado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    empleado.apellido.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // --- UPDATED: Filtered Data ---
+  // Now filters by both search term and selected despacho
+  const filteredEmpleados = empleados.filter(empleado => {
+    const matchesSearchTerm =
+      searchTerm === '' ||
+      empleado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      empleado.apellido.toLowerCase().includes(searchTerm.toLowerCase());
 
-  // --- Handlers ---
+    const matchesDespacho =
+      selectedDespacho === '' ||
+      empleado.despacho?.id.toString() === selectedDespacho;
+
+    return matchesSearchTerm && matchesDespacho;
+  });
+
+  // --- Handlers (no changes to the functions below, only the JSX) ---
   const handleAddClick = () => {
     setEditingEmpleado(null);
     setIsFormVisible(true);
@@ -83,8 +100,8 @@ export default function EmpleadoPage() {
     setIsFormVisible(false);
     setEditingEmpleado(null);
     Swal.fire({
-      title: "Empleado agregado",
-      text: "Se agrego el empleado correctamente",
+      title: "Empleado guardado",
+      text: "El empleado se guardó correctamente",
       timer: 2000
     })
   };
@@ -95,22 +112,17 @@ export default function EmpleadoPage() {
     setGlobalError(null);
   };
   
-  // --- Pagination Handlers ---
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setRowsPerPage(Number(event.target.value));
-    setPage(1); // Reset to first page when rows per page changes
+    setPage(1);
   };
 
   const handleNextPage = () => {
-    if (page < totalPages) {
-      setPage(page + 1);
-    }
+    if (page < totalPages) setPage(page + 1);
   };
 
   const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
+    if (page > 1) setPage(page - 1);
   };
 
 
@@ -133,38 +145,51 @@ export default function EmpleadoPage() {
       )}
 
       {!isFormVisible ? (
-        // --- Controls Section: Add Button and Search Box ---
-        <div className="mt-6 mb-4 flex justify-between items-center">
+        // --- UPDATED Controls Section ---
+        <div className="mt-6 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <button
               onClick={handleAddClick}
-              className="px-4 py-2 rounded text-white bg-green-500 hover:bg-green-600 transition"
+              className="px-4 py-2 w-full md:w-auto rounded text-white bg-green-500 hover:bg-green-600 transition"
             >
               Agregar Empleado
             </button>
-            <input 
-              type="text"
-              placeholder="Buscar por nombre o apellido..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+            <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-4">
+                {/* NEW: Despacho Filter Select */}
+                <select 
+                  value={selectedDespacho}
+                  onChange={(e) => setSelectedDespacho(e.target.value)}
+                  disabled={isLoadingDespachos}
+                  className="px-3 py-2 border border-gray-300 rounded-md w-full md:w-auto focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option value="">Todos los Despachos</option>
+                  {allDespachos?.map(despacho => (
+                    <option key={despacho.id} value={despacho.id}>
+                      {despacho.nombre}
+                    </option>
+                  ))}
+                </select>
+                <input 
+                  type="text"
+                  placeholder="Buscar por nombre o apellido..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-md w-full md:w-auto focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+            </div>
         </div>
       ) : (
-        <>
         <EmpleadoForm
           initialData={editingEmpleado}
           onSuccess={handleFormSuccess}
           onCancel={handleFormCancel}
         /> 
-        </> // Placeholder for the form
-         
       )}
 
-      {/* Conditionally render the table and pagination */}
+      {/* The rest of the component (table, pagination) remains the same */}
       {!isFormVisible && (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[1000px] border-collapse">
-            <thead>
+          <thead>
               <tr className="bg-gray-100">
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Nº Empleado</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Nombre</th>
@@ -172,7 +197,6 @@ export default function EmpleadoPage() {
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Puesto</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Despacho</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Sexo</th>
-                {/* <th className="p-3 text-center text-sm font-semibold text-gray-600 border-b">Supervisor</th> */}
                 <th className="p-3 text-center text-sm font-semibold text-gray-600 border-b">Activo</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Acciones</th>
               </tr>
@@ -191,11 +215,6 @@ export default function EmpleadoPage() {
                     <td className="p-3 border-b text-sm">{empleado.puesto?.nombre ?? 'N/A'}</td>
                     <td className="p-3 border-b text-sm">{empleado.despacho?.nombre ?? 'N/A'}</td>
                     <td className="p-3 border-b text-sm">{empleado.sexo}</td>
-              {/*       <td className="p-3 border-b text-sm text-center">
-                      <span className={`px-2 py-1 text-xs rounded-full ${empleado.es_supervisor ? 'bg-blue-100 text-blue-800' : 'bg-gray-200 text-gray-800'}`}>
-                         {empleado.es_supervisor ? 'Sí' : 'No'}
-                      </span>
-                    </td> */}
                     <td className="p-3 border-b text-sm text-center">
                        <span className={`px-2 py-1 text-xs rounded-full ${!empleado.baja ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                          {!empleado.baja ? 'Sí' : 'No'}
@@ -205,33 +224,26 @@ export default function EmpleadoPage() {
                       <div className="flex gap-3">
                         <button
                           onClick={() => handleEditClick({
-                            //id: Number(empleado.id),
+                            //id: Number(empleado.id), // Add the ID to the DTO
                             numero_empleado: empleado.numero_empleado,
                             nombre: empleado.nombre,
                             apellido: empleado.apellido,
                             sexo: empleado.sexo,
-                            puesto: empleado.puesto?.id ?? 0,       // fallback in case puesto is undefined
-                            despacho: empleado.despacho?.id ?? 0,   // fallback in case despacho is undefined
+                            puesto: empleado.puesto?.id ?? 0,
+                            despacho: empleado.despacho?.id ?? 0,
                             es_supervisor: empleado.es_supervisor
                           })}
                           className="px-3 py-1 rounded text-white bg-blue-500 hover:bg-blue-600 transition text-sm"
                         >
                           <FaEdit/>
                         </button>
-
                         <button
                            onClick={() => router.push(`/admin/horario/${empleado.id}`)}
-                         className={`px-3 py-1 rounded text-white transition text-sm ${
-                         deleteMutation.isPending ? 'bg-gray-400 cursor-not-allowed'
-      : 'bg-green-500 hover:bg-red-600' // Green turning red is unusual for an edit button
-  }`}
-  disabled={deleteMutation.isPending}
->
-  <FaTable/>
-</button>
-
-
-
+                           title="Editar Horario"
+                           className="px-3 py-1 rounded text-white transition text-sm bg-cyan-500 hover:bg-cyan-600"
+                        >
+                          <FaTable/>
+                        </button>
                         <button
                           onClick={() => handleDeleteClick(empleado.id.toString())}
                           className={`px-3 py-1 rounded text-white transition text-sm ${
@@ -243,20 +255,13 @@ export default function EmpleadoPage() {
                         >
                           <FaTrash/>
                         </button>
-
-                     
                       </div>
-
-
-
-
-
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className="text-center text-gray-500 p-4">
+                  <td colSpan={8} className="text-center text-gray-500 p-4">
                     {empleados.length > 0 ? 'No se encontraron resultados para su búsqueda.' : 'No se encontraron empleados.'}
                   </td>
                 </tr>
@@ -264,7 +269,6 @@ export default function EmpleadoPage() {
             </tbody>
           </table>
           
-          {/* --- Pagination Controls --- */}
           <div className="flex items-center justify-between mt-4">
               <div className="flex items-center gap-2">
                  <span className="text-sm text-gray-700">Filas por página:</span>
