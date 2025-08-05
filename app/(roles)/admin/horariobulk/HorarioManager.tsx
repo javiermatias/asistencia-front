@@ -1,9 +1,11 @@
+'use client'
 import React, { useState, useEffect } from 'react';
 
 import { HorarioTable } from './HorarioTable';
 import { EmpleadoConHorarios, UpdateHorarioPayload } from '@/app/types/horario';
 import { useGetDespachos } from '@/app/hooks/despacho/useDespachos';
 import { useGetHorariosPorDespacho, useGetTurnos, useUpdateHorariosPorDespacho } from '@/app/hooks/despacho/useHorario';
+import { useAuthStore } from '@/app/store/authStore';
 
 
 // --- This is where the magic happens: Processing the data ---
@@ -36,7 +38,9 @@ const processInitialData = (
 
 export const HorarioManager: React.FC = () => {
   // Assume you get the token from a context or auth service
-  const token = 'YOUR_JWT_TOKEN_HERE';
+ 
+  const { session } = useAuthStore();
+  const token = session?.user.access_token;
 
   const [selectedDespachoId, setSelectedDespachoId] = useState<number | null>(null);
   const [tableData, setTableData] = useState<EmpleadoConHorarios[]>([]);
@@ -97,12 +101,13 @@ export const HorarioManager: React.FC = () => {
       despachoId: selectedDespachoId,
       payload,
     });
+    //toast.success("Horarios guardados con exito")
   };
 
   const isLoading = isLoadingDespachos || isLoadingTurnos || isLoadingHorarios;
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+    <div className="p-2 md:p-4 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Gestión de Horarios

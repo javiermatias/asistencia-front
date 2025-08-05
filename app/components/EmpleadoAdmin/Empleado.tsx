@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuthStore } from '@/app/store/authStore';
-import { toast } from 'react-toastify';
+
 import Swal from 'sweetalert2';
 import { FaChevronLeft, FaChevronRight, FaEdit, FaTable, FaTrash } from 'react-icons/fa';
 import { useDeleteEmpleado, useGetEmpleados } from '@/app/hooks/despacho/useEmpleado';
@@ -12,6 +12,7 @@ import EmpleadoForm from './EmpleadoForm';
 import { CreateEmpleadoDTO } from '@/app/types/empleado/create-empleado';
 import { useRouter } from 'next/navigation'; 
 import { useGetDespachos } from '@/app/hooks/despacho/useDespachos';
+import { toast } from 'sonner';
 
 export default function EmpleadoPage() {
   // --- State Management ---

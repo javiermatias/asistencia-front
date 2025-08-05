@@ -2,7 +2,7 @@ import '@/app/ui/global.css';
 import { inter } from '@/app/ui/fonts';
 import AuthWrapper from './auth_wrapper';
 import TanstackProvider from './tanstack_provider';
-import { ToastContainer } from 'react-toastify'
+import { Toaster } from 'sonner';
 //import 'sweetalert2/src/sweetalert2.scss';
 export default function RootLayout({
   children,
@@ -19,7 +19,11 @@ export default function RootLayout({
             {children}
           </TanstackProvider>
         </AuthWrapper>
-        <ToastContainer
+         <Toaster richColors position="top-right" />
+
+
+
+   {/*      <ToastContainer
           position="top-right"
           autoClose={2000}
           hideProgressBar={false}
@@ -30,7 +34,8 @@ export default function RootLayout({
           draggable
           pauseOnHover
           theme="light"
-        />
+          className="z-[99999]" // A very high z-index using Tailwind's arbitrary values
+        /> */}
       </body>
     </html>
   );

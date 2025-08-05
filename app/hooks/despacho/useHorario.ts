@@ -1,6 +1,8 @@
 import { EmpleadoConHorarios, Turno, UpdateHorarioPayload } from '@/app/types/horario';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
+import { toast } from 'sonner';
+
 
 // --- Base URL and Type Definitions ---
 const API_HORARIO = `${process.env.NEXT_PUBLIC_API_URL}/horario`;
@@ -220,9 +222,11 @@ export const useUpdateHorariosPorDespacho = () => {
     mutationFn: updateHorariosPorDespacho,
 
     // This function runs after the mutation is successful.
-    onSuccess: (data, variables) => {
+    onSuccess: (data, variables,context) => {
       console.log('Schedules updated successfully:', data);
-
+      toast.success('¡Horarios guardados con éxito!', {
+        id: context as any, // Use the ID from onMutate to update the correct toast
+      });
       // This is the most important part for a good UX.
       // We invalidate the query for the specific despacho we just updated.
       // This tells React Query that the data is stale and triggers a refetch,
@@ -234,7 +238,14 @@ export const useUpdateHorariosPorDespacho = () => {
     },
 
     // This function runs if the mutation fails.
-    onError: (error) => {
+    onError: (error,context) => {
+      const errorMessage =
+      (error as any)?.response?.data?.message ||
+      'Error al guardar los horarios. Por favor, intente de nuevo.';
+    
+      toast.error(errorMessage, {
+        id: context as any, // Use the ID from onMutate
+      });
       console.error('Error updating schedules:', error);
       // Show an error notification to the user.
       // e.g., toast.error('Error al guardar los horarios. Por favor, intente de nuevo.');

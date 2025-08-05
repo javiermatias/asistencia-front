@@ -6,8 +6,9 @@ import { Despacho } from '@/app/types/despacho';
 import { useDeleteDespacho, useGetDespachos } from '@/app/hooks/despacho/useDespachos';
 import DespachoForm from './DespachoForm';
 import { useAuthStore } from '@/app/store/authStore';
-import { toast } from 'react-toastify';
+
 import Swal from 'sweetalert2';
+import { toast } from 'sonner';
 
 export default function DespachoPage() {
   const [isFormVisible, setIsFormVisible] = useState(false);
