@@ -1,3 +1,4 @@
+import { EmpleadoConHorarios, Turno, UpdateHorarioPayload } from '@/app/types/horario';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 
@@ -5,10 +6,7 @@ import axios, { AxiosError } from 'axios';
 const API_HORARIO = `${process.env.NEXT_PUBLIC_API_URL}/horario`;
 const API_TURNO = `${process.env.NEXT_PUBLIC_API_URL}/turno`;
 
-type Turno = {
-  id: number;
-  nombre: string;
-};
+
 
 type HorarioAPIResponse = {
   id: number;
@@ -129,6 +127,117 @@ export const useUpdateHorario = () => {
     onError: (error) => {
       // Log errors to the console for debugging.
       console.error("Error updating horario:", error.response?.data || error.message);
+    },
+  });
+};
+
+
+///////////////////////////////////////////HORARIO DESPACHO///////////////////////////////////////////
+const fetchHorariosPorDespacho = async (
+  token: string,
+  despachoId: number,
+): Promise<EmpleadoConHorarios[]> => {
+  const { data } = await axios.get(`${API_HORARIO}/despacho/${despachoId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return data;
+};
+
+
+/**
+ * Updates the schedules for multiple employees in a specific despacho.
+ * Corresponds to: PATCH /horario/despacho/:id
+ */
+const updateHorariosPorDespacho = async ({
+  token,
+  despachoId,
+  payload,
+}: {
+  token: string;
+  despachoId: number;
+  payload: UpdateHorarioPayload[];
+}) => {
+  const { data } = await axios.patch(
+    `${API_HORARIO}/despacho/${despachoId}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return data;
+};
+
+export const useGetTurnos = (token: string) => {
+  return useQuery<Turno[], Error>({
+    // The key for this query
+    queryKey: ['turnos'],
+    // The function that will be called to fetch the data
+    queryFn: () => fetchAllTurnos(token),
+    // Only run the query if the token exists
+    enabled: !!token,
+    // Turnos don't change often, so we can consider the data "fresh" for a long time
+    // to avoid unnecessary refetching.
+    //staleTime: 1000 * 60 * 60, // 1 hour    
+    //cacheTime: 1000 * 60 * 60, // 1 hour
+  });
+};
+
+/**
+ * React Query hook to fetch schedules for a specific despacho.
+ * @param token The user's JWT token.
+ * @param despachoId The ID of the despacho to fetch, or null if none is selected.
+ */
+export const useGetHorariosPorDespacho = (
+  token: string,
+  despachoId: number | null,
+) => {
+  return useQuery<EmpleadoConHorarios[], Error>({
+    // The query key is an array. It uniquely identifies this query's data.
+    // By including `despachoId`, TanStack Query knows to refetch if the ID changes.
+    queryKey: ['horarios', despachoId],
+
+    // The query function only runs if `enabled` is true.
+    // We use a non-null assertion `!` because `enabled` guarantees `despachoId` is not null.
+    queryFn: () => fetchHorariosPorDespacho(token, despachoId!),
+
+    // This is crucial: only run the query if both the token and a despachoId are available.
+    enabled: !!token && !!despachoId,
+  });
+};
+
+/**
+ * React Query mutation hook to update the schedules for a despacho.
+ * Use the `mutate` function returned by this hook to trigger the update.
+ */
+export const useUpdateHorariosPorDespacho = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateHorariosPorDespacho,
+
+    // This function runs after the mutation is successful.
+    onSuccess: (data, variables) => {
+      console.log('Schedules updated successfully:', data);
+
+      // This is the most important part for a good UX.
+      // We invalidate the query for the specific despacho we just updated.
+      // This tells React Query that the data is stale and triggers a refetch,
+      // automatically updating the UI with the newly saved data.
+      queryClient.invalidateQueries({ queryKey: ['horarios', variables.despachoId] });
+
+      // You can also show a success notification here.
+      // e.g., toast.success('Horarios guardados con éxito!');
+    },
+
+    // This function runs if the mutation fails.
+    onError: (error) => {
+      console.error('Error updating schedules:', error);
+      // Show an error notification to the user.
+      // e.g., toast.error('Error al guardar los horarios. Por favor, intente de nuevo.');
     },
   });
 };
