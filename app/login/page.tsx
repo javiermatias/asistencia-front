@@ -4,25 +4,40 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { lusitana } from '@/app/ui/fonts';
 import { signIn } from 'next-auth/react';
-
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-
-    const res = await signIn('credentials', {
-      redirect: false,
-      username: formData.get('username'),
-      password: formData.get('password'),
-    });
-
-    if (res?.error) {
-      setErrorMessage('Credenciales inválidas');
-    } else {
-      router.push('/'); // ✅ Replace with your desired route
+    setErrorMessage(''); // Clear previous errors
+  
+    try {
+      // 1. Get the device fingerprint
+      const fp = await FingerprintJS.load();
+      const result = await fp.get();
+      const deviceId = result.visitorId;
+  
+      const formData = new FormData(event.currentTarget);
+  
+      // 2. Pass the deviceId along with other credentials to the signIn function
+      const res = await signIn('credentials', {
+        redirect: false, // Important to handle the response manually
+        username: formData.get('username'),
+        password: formData.get('password'),
+        deviceId: deviceId, // <-- THE NEW, CRUCIAL PART
+      });
+  
+      if (res?.error) {
+        // next-auth sets res.error if authorize returns null or an error is thrown
+        setErrorMessage('Credenciales inválidas o inicio de sesión desde un dispositivo no autorizado.');
+      } else {
+        router.push('/'); // ✅ Success!
+      }
+    } catch (error) {
+      console.error("An error occurred during the login process:", error);
+      setErrorMessage("Ocurrió un error. Por favor, inténtelo de nuevo.");
     }
   };
 

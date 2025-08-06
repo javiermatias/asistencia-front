@@ -37,16 +37,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     providers: [
       Credentials({
         // You can specify which fields should be submitted, but we'll define them in the login form instead
-        credentials: {
+      /*   credentials: {
           username: { label: "Username" },
           password: { label: "Password", type: "password" },
-        },
+        }, */
         async authorize(credentials) {
-          if (!credentials?.username || !credentials.password) {
-            return null;
+          if (!credentials?.username || !credentials.password || !credentials.deviceId) {
+            return null; // Return null if any required field is missing
           }
 
-          //console.log("hola" + process.env.NEXT_PUBLIC_API_URL)
   
           // Call our mock API to authenticate the user(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/login`
           const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
@@ -57,6 +56,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             body: JSON.stringify({
               username: credentials.username,
               password: credentials.password,
+              deviceId: credentials.deviceId, // <-- PASSING IT TO THE BACKEND
             }),
           });
   
