@@ -239,7 +239,7 @@ export default function EmpleadoPage() {
                           <FaEdit/>
                         </button>
                         <button
-                           onClick={() => router.push(`/admin/horario/${empleado.id}`)}
+                           onClick={() => router.push(`/admin/horario/${empleado.id}?nombre=${empleado.nombre}&apellido=${empleado.apellido}&nroEmpleado=${empleado.numero_empleado}`)}
                            title="Editar Horario"
                            className="px-3 py-1 rounded text-white transition text-sm bg-cyan-500 hover:bg-cyan-600"
                         >

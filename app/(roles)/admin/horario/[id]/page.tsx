@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation'; // NEW: Import useRouter
+import { useParams, useRouter, useSearchParams } from 'next/navigation'; // NEW: Import useRouter
 import Swal from 'sweetalert2'; // NEW: Import SweetAlert2
 
 import styles from './HorarioEditor.module.css';
@@ -20,6 +20,14 @@ const daysOfWeek = [
 export default function HorarioEditorPage() {
   const params = useParams();
   const employeeId = params.id as string;
+    // 2. Get URL query parameters
+    const searchParams = useSearchParams();
+    const nombre = searchParams.get('nombre');
+    const apellido = searchParams.get('apellido');
+    const nroEmpleado = searchParams.get('nroEmpleado');
+  
+  
+  
   const router = useRouter(); // NEW: Initialize the router for navigation
 
   const { session } = useAuthStore();
@@ -121,7 +129,10 @@ export default function HorarioEditorPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Editor de Horario para Empleado #{employeeId}</h1>
+       <h1 className={styles.title}>
+        Editor de Horario para {nombre} {apellido} (Nº {nroEmpleado || 'N/A'})
+      </h1>
+      
 
       {allTurnos && schedule.length > 0 ? (
         <div className={styles.tableContainer}>
