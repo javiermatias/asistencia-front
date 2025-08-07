@@ -8,24 +8,29 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const router = useRouter();
-
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage(''); // Clear previous errors
-  
+    setIsLoading(true);
     try {
       // 1. Get the device fingerprint
       const fp = await FingerprintJS.load();
       const result = await fp.get();
       const deviceId = result.visitorId;
   
-      const formData = new FormData(event.currentTarget);
+      // THE FIX IS HERE:
+      // We are telling TypeScript that event.currentTarget is indeed a form element.
+      //const form = event.currentTarget as HTMLFormElement;
+      //const formData = new FormData(form);
   
       // 2. Pass the deviceId along with other credentials to the signIn function
       const res = await signIn('credentials', {
         redirect: false, // Important to handle the response manually
-        username: formData.get('username'),
-        password: formData.get('password'),
+        username: username,
+        password: password,
         deviceId: deviceId, // <-- THE NEW, CRUCIAL PART
       });
   
@@ -38,6 +43,8 @@ export default function LoginForm() {
     } catch (error) {
       console.error("An error occurred during the login process:", error);
       setErrorMessage("Ocurrió un error. Por favor, inténtelo de nuevo.");
+    }finally {
+      setIsLoading(false);
     }
   };
 
@@ -61,6 +68,8 @@ export default function LoginForm() {
               name="username"
               id="username"
               className="w-full rounded border border-gray-300 p-2"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
@@ -74,6 +83,8 @@ export default function LoginForm() {
               name="password"
               id="password"
               className="w-full rounded border border-gray-300 p-2"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
@@ -86,7 +97,7 @@ export default function LoginForm() {
             type="submit"
             className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
-            Ingresar
+            {isLoading ? 'Ingresando...' : 'Ingresar'}
           </button>
         </div>
       </form>
