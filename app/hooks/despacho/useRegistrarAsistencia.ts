@@ -6,6 +6,7 @@ interface RegistrarAsistenciaDto {
   qrToken: string;
   latitud: number;
   longitud: number;
+  timestampUtc:string;
 }
 
 // This can be the 'Asistencia' entity shape from your backend

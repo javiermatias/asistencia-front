@@ -2,45 +2,43 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation'; // <-- IMPORTED
 import { useUserLocation } from '@/app/hooks/despacho/useUserLocation';
 import { useRegistrarAsistencia } from '@/app/hooks/despacho/useRegistrarAsistencia';
 import Spinner from '@/app/ui/spiner';
 import { QrReader } from 'react-qr-reader';
-// Define a type for our status messages
+import { CheckCircleIcon } from '@heroicons/react/24/outline'; // <-- IMPORTED
 
 export default function ScanPage() {
+    const router = useRouter(); // <-- ADDED
     const { data: session } = useSession({ required: true });
     const { latitud, longitud, error: locationError, isLoading: isLocationLoading } = useUserLocation();
   
-    // We will now use these flags directly to control the UI
     const { mutate, isPending,isSuccess, isError, error: apiError, data: apiData } = useRegistrarAsistencia();
   
-    const [scanEnabled, setScanEnabled] = useState(true); // Control when the scanner is active
+    const [scanEnabled, setScanEnabled] = useState(true);
   
     const handleScanResult = (result: any, error: any) => {
-      // Only process if scan is enabled and a result is found
       if (scanEnabled && !!result) {
-        setScanEnabled(false); // Disable scanner to prevent multiple submissions
+        setScanEnabled(false);
         const qrToken = result.getText();
         console.log('QR Code Scanned:', qrToken);
   
         if (!latitud || !longitud) {
-          // This is a pre-check, not using the mutation state yet
           console.error('Location not available when QR was scanned.');
-          return; // Early exit
+          return;
         }
+        const timestampUtc = new Date().toISOString();
         
         if (session?.user.access_token) {
           mutate({
-            dto: { qrToken, latitud, longitud },
+            dto: { qrToken, latitud, longitud, timestampUtc },
             token: session.user.access_token,
           });
         }
       }
     };
   
-    // --- UI RENDERING LOGIC ---
-    
     // 1. Initial State: Waiting for location
     if (isLocationLoading) {
       return (
@@ -70,22 +68,28 @@ export default function ScanPage() {
       );
     }
   
-    // 4. API Call Succeeded State
+    // 4. API Call Succeeded State (MODIFIED BLOCK)
     if (isSuccess) {
       const successMessage = apiData?.fecha_egreso
         ? "Se ha registrado su salida correctamente."
         : "Se ha registrado su entrada correctamente.";
-  
+
       return (
         <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-green-50">
-          <p className="text-green-700 text-2xl font-bold text-center">{successMessage}</p>
+          <CheckCircleIcon className="w-24 h-24 text-green-500 mb-6" />
+          <p className="text-green-800 text-2xl font-bold text-center mb-8">{successMessage}</p>
+          <button
+            onClick={() => router.push('/agente')}
+            className="flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
+          >
+            Aceptar
+          </button>
         </main>
       );
     }
     
     // 5. API Call Failed State
     if (isError) {
-      // Extract a user-friendly error message from the AxiosError
       const errorMessage = (apiError as any)?.response?.data?.message || 'Ocurrió un error inesperado.';
   
       return (
@@ -109,4 +113,4 @@ export default function ScanPage() {
         <p className="mt-4 text-gray-600">Apunte la cámara al código QR</p>
       </main>
     );
-  }
+}
