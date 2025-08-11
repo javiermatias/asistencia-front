@@ -4,7 +4,7 @@ import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { ZodError, z } from 'zod';
-import { signIn } from '@/auth';
+import { signIn, signOut } from '@/auth';
 import { AuthError } from 'next-auth';
 import { FormState, User } from './definitions';
 
@@ -215,3 +215,11 @@ export const toFormState = (
     };
 };
 
+
+
+
+export async function handleSignOut() {
+  await signOut();
+  // While signOut often handles this, an explicit redirect is robust.
+  redirect('/login'); 
+}

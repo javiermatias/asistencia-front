@@ -1,25 +1,13 @@
-
-import { NavLink } from "@/app/types/nav-link";
-import SideNav from "@/app/ui/dashboard/sidenav";
-import { DocumentDuplicateIcon, HomeIcon, UserGroupIcon } from "@heroicons/react/24/outline";
-
+import ProtectedRoleLayout from "@/app/ui/layout/ProtectedRoleLayout";
+// src/app/admin/layout.tsx
+// This layout will wrap all pages inside the /admin route segment,
+// e.g., /admin/dashboard, /admin/empleados, etc.
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    const agentLinks: NavLink[] = [
-        { name: 'Home', href: '/admin/dashboard', icon: HomeIcon },
-        {
-          name: 'Despachos',
-          href: '/admin/despacho', // I've updated the href for clarity
-          icon: DocumentDuplicateIcon,
-        },
-        { name: 'Clientes', href: '/admin/clientes', icon: UserGroupIcon },
-      ];
-    return (
-        <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
-            <div className="w-full flex-none md:w-64">
-                <SideNav  />
-            </div>
-            <div className="flex-grow p-6 md:overflow-y-auto md:p-2">{children}</div>
-        </div>
-    );
+  return (
+    // We wrap the children with our protected layout and specify the role.
+    <ProtectedRoleLayout requiredRole="admin">
+      {children}
+    </ProtectedRoleLayout>
+  );
 }

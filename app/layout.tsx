@@ -3,6 +3,7 @@ import { inter } from '@/app/ui/fonts';
 import AuthWrapper from './auth_wrapper';
 import TanstackProvider from './tanstack_provider';
 import { Toaster } from 'sonner';
+import HydrationHandler from './ui/layout/HydrationHandler';
 //import 'sweetalert2/src/sweetalert2.scss';
 export default function RootLayout({
   children,
@@ -16,26 +17,13 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <AuthWrapper> {/* Wrapping the entire app with AuthWrapper */}
           <TanstackProvider>
+           <HydrationHandler>
             {children}
+            </HydrationHandler>
           </TanstackProvider>
         </AuthWrapper>
          <Toaster richColors position="top-right" />
 
-
-
-   {/*      <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          className="z-[99999]" // A very high z-index using Tailwind's arbitrary values
-        /> */}
       </body>
     </html>
   );
