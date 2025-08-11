@@ -28,7 +28,8 @@ export default function ScanPage() {
           console.error('Location not available when QR was scanned.');
           return;
         }
-        const timestampUtc = new Date().toISOString();
+         //const timestampUtc = new Date().toISOString();
+        const  timestampUtc = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -1);
         
         if (session?.user.access_token) {
           mutate({

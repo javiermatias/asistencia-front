@@ -109,10 +109,13 @@ export default function EmpleadoPage() {
   const handleFormError = (errorMessage: string) => {
     // When an error occurs, the form stays open so the user can fix it.
     // We use Swal to show the error message.
+    setIsFormVisible(false);
+    setEditingEmpleado(null);
     Swal.fire({
       icon: 'error',
       title: 'Error al Guardar',
       text: errorMessage, // Display the specific message from the backend
+      timer: 2000
     });
   };
 
