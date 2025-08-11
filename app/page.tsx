@@ -52,7 +52,7 @@ export default function Page() {
 
       switch (session.user.role) {
         case 'admin':
-          router.push('/admin');
+          router.push('/admin/dashboard');
           break;
         case 'supervisor':
           router.push('/supervisor');
