@@ -106,6 +106,15 @@ export default function EmpleadoPage() {
       timer: 2000
     })
   };
+  const handleFormError = (errorMessage: string) => {
+    // When an error occurs, the form stays open so the user can fix it.
+    // We use Swal to show the error message.
+    Swal.fire({
+      icon: 'error',
+      title: 'Error al Guardar',
+      text: errorMessage, // Display the specific message from the backend
+    });
+  };
 
   const handleFormCancel = () => {
     setIsFormVisible(false);
@@ -183,6 +192,7 @@ export default function EmpleadoPage() {
           initialData={editingEmpleado}
           onSuccess={handleFormSuccess}
           onCancel={handleFormCancel}
+          onError={handleFormError}
         /> 
       )}
 

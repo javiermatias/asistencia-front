@@ -6,14 +6,16 @@ import { useAuthStore } from '@/app/store/authStore';
 import { useAddEmpleado, useUpdateEmpleado } from '@/app/hooks/despacho/useEmpleado';
 import { CreateEmpleadoDTO } from '@/app/types/empleado/create-empleado';
 import { useGetDespachos, useGetPuestos } from '@/app/hooks/despacho/useDespachos';
+import { AxiosError } from 'axios';
 
 interface EmpleadoFormProps {
   initialData?: CreateEmpleadoDTO | null;
   onSuccess: () => void;
   onCancel: () => void;
+  onError: (errorMessage: string) => void; // The parent will provide this function
 }
 
-const EmpleadoForm = ({ initialData, onSuccess, onCancel }: EmpleadoFormProps) => {
+const EmpleadoForm = ({ initialData, onSuccess, onCancel, onError }: EmpleadoFormProps) => {
   const isEditMode = !!initialData;
 
   // Form state
@@ -63,21 +65,22 @@ const EmpleadoForm = ({ initialData, onSuccess, onCancel }: EmpleadoFormProps) =
       despacho: parseInt(despachoId, 10),
       es_supervisor: false,
     };
+    const mutationOptions = {
+      onSuccess, // This is a shorthand for onSuccess: onSuccess
+      onError: (error: unknown) => {
+        let errorMessage = 'Ocurrió un error inesperado.';
+        if (error instanceof AxiosError) {
+          errorMessage = error.response?.data?.message || errorMessage;
+        }
+        // Call the parent's error handler
+        onError(errorMessage);
+      },
+    };
 
     if (isEditMode) {
-      updateEmpleadoMutation.mutate(
-        // The mutate function expects the exact object our `updateEmpleado` function needs
-        {  empleado: empleadoData, token },
-        { onSuccess }
-      );
-
-      
+      updateEmpleadoMutation.mutate({ empleado: empleadoData, token }, mutationOptions);
     } else {
-      addEmpleadoMutation.mutate(
-        // The mutate function expects the exact object our `addEmpleado` function needs
-        { empleado: { ...empleadoData, numero_empleado: numeroEmpleado }, token },
-        { onSuccess }
-      );
+      addEmpleadoMutation.mutate({ empleado: { ...empleadoData, numero_empleado: numeroEmpleado }, token }, mutationOptions);
     }
   };
 
