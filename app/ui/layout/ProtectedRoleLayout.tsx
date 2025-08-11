@@ -8,7 +8,8 @@ import { useAuthStore } from '@/app/store/authStore';
 import Spinner from '../spiner';
 import SideNavAdmin from '../dashboard/SideNavAdmin';
 import SideNavSupervisor from '../dashboard/SideNavSupervisor';
-import SideNavAgente from '../dashboard/SideNavSupervisor';
+import SideNavAgente from '../dashboard/SideNavAgente';
+
 
 // Define the props for our layout, including the required role
 interface ProtectedRoleLayoutProps {

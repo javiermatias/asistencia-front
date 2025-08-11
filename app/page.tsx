@@ -49,6 +49,7 @@ export default function Page() {
     if (sessionStatus === 'authenticated' && isTokenValid) {
       console.log('Token is valid, proceeding to dashboard...');
       setSession(session);
+      console.log(session.user.role);
 
       switch (session.user.role) {
         case 'admin':

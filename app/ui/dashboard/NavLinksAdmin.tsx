@@ -1,8 +1,11 @@
 'use client';
 import {
-  UserGroupIcon,
+  
   HomeIcon,
-  DocumentDuplicateIcon,
+
+  UsersIcon,
+  BuildingOffice2Icon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
 
 import Link from 'next/link';
@@ -13,19 +16,19 @@ import clsx from 'clsx';
 const links = [
   { name: 'Home', href: '/admin/dashboard', icon: HomeIcon },
   {
-    name: 'Emmpleados',
+    name: 'Empleados',
     href: '/admin/empleado',
-    icon: DocumentDuplicateIcon,
+    icon: UsersIcon,
   },
   {
     name: 'Despachos',
     href: '/admin/despacho',
-    icon: DocumentDuplicateIcon,
+    icon: BuildingOffice2Icon,
   },
   {
     name: 'Horarios',
     href: '/admin/horariobulk',
-    icon: DocumentDuplicateIcon,
+    icon: ClockIcon,
   }
 
 ];

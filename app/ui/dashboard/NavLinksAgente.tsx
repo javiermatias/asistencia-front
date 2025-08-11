@@ -1,8 +1,7 @@
 'use client';
 import {
-  UserGroupIcon,
   HomeIcon,
-  DocumentDuplicateIcon,
+  QrCodeIcon,
 } from '@heroicons/react/24/outline';
 
 import Link from 'next/link';
@@ -13,9 +12,9 @@ import clsx from 'clsx';
 const links = [
   { name: 'Home', href: '/agente/dashboard', icon: HomeIcon },
   {
-    name: 'Bitacoras',
-    href: '/agente/dashboard/datos?id=0',
-    icon: DocumentDuplicateIcon,
+    name: 'Escanear',
+    href: '/agente/escanear',
+    icon: QrCodeIcon,
   }
 
 ];
