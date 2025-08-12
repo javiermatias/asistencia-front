@@ -70,16 +70,22 @@ export default function EmpleadoPage() {
     setGlobalError(null);
   };
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (title: string, id: string) => {
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¡No podrás revertir esta acción!",
+      title: `${title} `,
+      text: 'Estas seguro de eliminar?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
+       background: '#f0f0f0',
       confirmButtonText: 'Sí, ¡elimínalo!',
       cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'my-swal-confirm-button',
+        cancelButton: 'my-swal-cancel-button'
+      }
+    
     }).then((result) => {
       if (result.isConfirmed) {
         deleteMutation.mutate({id, token}, {
@@ -103,7 +109,11 @@ export default function EmpleadoPage() {
     Swal.fire({
       title: "Empleado guardado",
       text: "El empleado se guardó correctamente",
-      timer: 2000
+      timer: 2000,
+      customClass: {
+        confirmButton: 'my-swal-confirm-button',
+        
+      }
     })
   };
   const handleFormError = (errorMessage: string) => {
@@ -115,7 +125,11 @@ export default function EmpleadoPage() {
       icon: 'error',
       title: 'Error al Guardar',
       text: errorMessage, // Display the specific message from the backend
-      timer: 2000
+      timer: 2000,
+      customClass: {
+        confirmButton: 'my-swal-confirm-button',
+        
+      }
     });
   };
 
@@ -259,7 +273,7 @@ export default function EmpleadoPage() {
                           <FaTable/>
                         </button>
                         <button
-                          onClick={() => handleDeleteClick(empleado.id.toString())}
+                          onClick={() => handleDeleteClick(empleado.numero_empleado + " " + empleado.apellido + " " + empleado.nombre,empleado.id.toString(),)}
                           className={`px-3 py-1 rounded text-white transition text-sm ${
                             deleteMutation.isPending
                               ? 'bg-gray-400 cursor-not-allowed'

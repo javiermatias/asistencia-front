@@ -28,14 +28,14 @@ input[type='number']::-webkit-outer-spin-button {
   padding: 0.75rem 1.5rem !important;
   font-size: 1rem !important;
   border-radius: 8px !important;
-  background-color: #f6f3f4 !important; /* Example: light grey background */
-  color: #4b5563 !important; /* Example: dark grey text */
+  background-color: #4CAF50 !important; /* Fresh green */
+  color: #111827 !important; /* Very dark gray text */
 }
 
 .my-swal-cancel-button {
   padding: 0.75rem 1.5rem !important;
   font-size: 1rem !important;
   border-radius: 8px !important;
-  background-color: #f6f3f4 !important; /* Example: light grey background */
-  color: #4b5563 !important; /* Example: dark grey text */
+  background-color: #FBBF24 !important; /* Warm amber */
+  color: #111827 !important; /* Very dark gray text */
 }

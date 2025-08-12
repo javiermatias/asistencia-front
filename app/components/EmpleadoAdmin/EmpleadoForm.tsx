@@ -1,6 +1,5 @@
 'use client';
 
-
 import { FormEvent, useEffect, useState } from 'react';
 import { useAuthStore } from '@/app/store/authStore';
 import { useAddEmpleado, useUpdateEmpleado } from '@/app/hooks/despacho/useEmpleado';
@@ -25,7 +24,7 @@ const EmpleadoForm = ({ initialData, onSuccess, onCancel, onError }: EmpleadoFor
   const [sexo, setSexo] = useState<'Masculino' | 'Femenino' | 'Otro'>('Masculino');
   const [puestoId, setPuestoId] = useState('');
   const [despachoId, setDespachoId] = useState('');
-  //const [esSupervisor, setEsSupervisor] = useState(false);
+  const [esSupervisor, setEsSupervisor] = useState(false); // <-- 1. ADDED STATE
 
   // Get token from the store
   const token = useAuthStore((state) => state.session?.user.access_token);
@@ -47,7 +46,7 @@ const EmpleadoForm = ({ initialData, onSuccess, onCancel, onError }: EmpleadoFor
       setSexo(initialData.sexo);
       setPuestoId(initialData.puesto?.toString() ?? '');
       setDespachoId(initialData.despacho?.toString() ?? '');
-      //setEsSupervisor(initialData.es_supervisor);
+      setEsSupervisor(initialData.es_supervisor ?? false); // <-- 2. POPULATE ON EDIT
     }
   }, [initialData, isEditMode]);
 
@@ -63,7 +62,7 @@ const EmpleadoForm = ({ initialData, onSuccess, onCancel, onError }: EmpleadoFor
       sexo,
       puesto: parseInt(puestoId, 10),
       despacho: parseInt(despachoId, 10),
-      es_supervisor: false,
+      es_supervisor: esSupervisor, // <-- 3. USE STATE IN SUBMISSION
     };
     const mutationOptions = {
       onSuccess, // This is a shorthand for onSuccess: onSuccess
@@ -88,8 +87,6 @@ const EmpleadoForm = ({ initialData, onSuccess, onCancel, onError }: EmpleadoFor
   const mutationError = addEmpleadoMutation.error || updateEmpleadoMutation.error;
 
   return (
-    // The JSX for the form remains exactly the same as in the previous answer.
-    // No changes are needed in the return statement.
     <form onSubmit={handleSubmit} className="p-5 border border-gray-300 rounded-lg mb-6 bg-gray-50">
       <h2 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2 mb-4">
         {isEditMode ? 'Editar Empleado' : 'Agregar Empleado'}
@@ -125,16 +122,29 @@ const EmpleadoForm = ({ initialData, onSuccess, onCancel, onError }: EmpleadoFor
       {/* Despacho Select */}
       <div className="mb-4">
         <label htmlFor="despacho" className="block mb-1 font-medium text-gray-700">Despacho</label>
-        <select id="despacho" value={despachoId} onChange={(e) => setDespachoId(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded" disabled={isLoadingDespachos}>
+        <select id="despacho" value={despachoId} onChange={(e) => setDespachoId(e.target.value)} required className="w-full px-3 py-2 border border-ray-300 rounded" disabled={isLoadingDespachos}>
           <option value="" disabled>{isLoadingDespachos ? 'Cargando...' : 'Seleccione un despacho'}</option>
           {despachos?.map((despacho) => (<option key={despacho.id} value={despacho.id}>{despacho.nombre}</option>))}
         </select>
       </div>
 
 
-      {/* Supervisor Checkbox
-      
-      */}
+     {/* Supervisor Checkbox */}
+<div className="mb-4 flex items-center">
+  <input
+    id="esSupervisor"
+    type="checkbox"
+    checked={esSupervisor}
+    onChange={(e) => setEsSupervisor(e.target.checked)}
+    className="h-6 w-6 scale-125 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+  />
+  <label
+    htmlFor="esSupervisor"
+    className="ml-3 block text-base font-medium text-gray-700"
+  >
+    Es Supervisor
+  </label>
+</div>
       
 
       {/* Buttons */}
