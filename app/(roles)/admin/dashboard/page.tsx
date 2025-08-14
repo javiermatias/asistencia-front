@@ -2,7 +2,8 @@ import { auth } from "@/auth";
 
 export default async function AdminPage() {
     const session = await auth();
-  
+    const  timestampUtc = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -1);
+    console.log(timestampUtc);
     return (
       <main className="flex items-center justify-center min-h-screen bg-blue-50">
         <div className="w-full max-w-2xl p-8 space-y-4 text-center bg-white rounded-lg shadow-md">

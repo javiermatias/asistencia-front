@@ -194,8 +194,7 @@ export const useGetTurnos = (token: string) => {
  * @param despachoId The ID of the despacho to fetch, or null if none is selected.
  */
 export const useGetHorariosPorDespacho = (
-  token: string,
-  despachoId: number | null,
+token: string, despachoId: number | null | undefined,
 ) => {
   return useQuery<EmpleadoConHorarios[], Error>({
     // The query key is an array. It uniquely identifies this query's data.

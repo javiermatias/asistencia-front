@@ -18,6 +18,12 @@ const fetchDespachos = async (token: string): Promise<Despacho[]> => {
   return data;
 };
 
+const getDespachoBySupervisor = async ({ token }: { token?: string }): Promise<Despacho> => {
+  const response = await axios.get(`${API_URL}/supervisor/despacho`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
 const getDespachoById = async ({ id, token }: { id: string; token?: string }): Promise<Despacho> => {
   const response = await axios.get(`${API_URL}/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -168,6 +174,20 @@ export const useGetDespachoById = (id: string, token?: string) => {
   });
 };
 
+export const useGetDespachoBySupervisor = (token?: string) => {
+  return useQuery<Despacho, AxiosError>({
+    // The query key is an array that uniquely identifies this data.
+    // When the id changes, React Query will automatically refetch.
+    queryKey: ['despacho', 'supervisor'], 
+    
+    // The function that will be called to fetch the data.
+    queryFn: () => getDespachoBySupervisor({token }),
+
+    // This query will only run if both `id` and `token` are truthy.
+    // This prevents unnecessary API calls.
+    enabled: !!token,
+  });
+};
 
 // ====================================================================
 // HOOK 2: useRenovateDespachoQr
