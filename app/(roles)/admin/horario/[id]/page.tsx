@@ -50,7 +50,7 @@ export default function HorarioEditorPage() {
     if (!existingSchedule || !allTurnos) {
       return;
     }
-    const defaultTurno = allTurnos.find(t => t.nombre.toLowerCase() === 'mañana');
+    const defaultTurno = allTurnos.find(t => t.nombre.toLowerCase() === 'matutino');
     if (!defaultTurno) {
       console.error("Critical Error: Default 'Mañana' shift not found.");
       return;

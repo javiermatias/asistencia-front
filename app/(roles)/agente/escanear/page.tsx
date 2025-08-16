@@ -17,7 +17,8 @@ export default function ScanPage() {
     const { mutate, isPending,isSuccess, isError, error: apiError, data: apiData } = useRegistrarAsistencia();
   
     const [scanEnabled, setScanEnabled] = useState(true);
-  
+    const  timestampUtc1 = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -1);
+    console.log(timestampUtc1);
     const handleScanResult = (result: any, error: any) => {
       if (scanEnabled && !!result) {
         setScanEnabled(false);
