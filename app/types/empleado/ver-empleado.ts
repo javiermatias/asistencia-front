@@ -13,3 +13,15 @@ export interface EmpleadoDTO {
     es_supervisor?: boolean;
   }
 
+  export interface EmpleadoBaja {
+    id: number;
+    nombre: string;
+    apellido: string;
+    baja_date: string; // This will be an ISO date string from the API
+    puesto: {
+      nombre: string;
+    } | null; // Handle cases where puesto might be null
+    despacho: {
+      nombre: string;
+    } | null; // Handle cases where despacho might be null
+  }

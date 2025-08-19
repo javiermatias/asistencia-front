@@ -7,7 +7,7 @@ export default async function AdminEmpleado() {
   
     return (
       <section className="pt-16 p-2">
-        <div className="container mx-auto px-2">
+        <div className="container mx-auto px-2 ">
               <EmpleadoPage></EmpleadoPage>
          </div>
       </section>

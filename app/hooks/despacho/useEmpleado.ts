@@ -2,7 +2,7 @@
 
 import { CreateEmpleadoDTO } from "@/app/types/empleado/create-empleado";
 import { UpdateEmpleadoDTO } from "@/app/types/empleado/update-empleado";
-import { EmpleadoDTO } from "@/app/types/empleado/ver-empleado";
+import { EmpleadoBaja, EmpleadoDTO } from "@/app/types/empleado/ver-empleado";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 
@@ -15,7 +15,7 @@ export interface PaginatedEmpleadosResponse {
 }
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/empleado`;
-
+const API_URL_BAJAS = `${process.env.NEXT_PUBLIC_API_URL}/empleado/bajas`;
 // --- API Functions with token ---
 
 const fetchEmpleados = async (
@@ -78,6 +78,20 @@ const deleteEmpleado = async ({
       Authorization: `Bearer ${token}`,
     },
   });
+};
+
+/**
+ * Fetches the list of employees who have left the company.
+ * @param token - The authentication JWT token.
+ * @returns A promise that resolves to an array of EmpleadoBaja.
+ */
+const fetchBajas = async (token: string): Promise<EmpleadoBaja[]> => {
+  const { data } = await axios.get(API_URL_BAJAS, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return data;
 };
 
 // --- React Query Hooks ---
@@ -143,18 +157,17 @@ export const useDeleteEmpleado = () => {
   });
 };
 
+/**
+ * Custom hook to get the list of employees who have left the company.
+ * @param token - The authentication token.
+ */
+export const useGetBajas = (token: string) => {
+  return useQuery<EmpleadoBaja[], Error>({
+    queryKey: ['empleadosBajas'],
+    queryFn: () => fetchBajas(token),
+    enabled: !!token, // The query will only run if the token exists
+    staleTime: 1000 * 60 * 5, // Optional: Cache data for 5 minutes
+  });
+};
 
 
-// Define the types for the data you expect from the API
-export interface Puesto {
-  id: number;
-  nombre: string;
-}
-
-export interface Despacho {
-  id: number;
-  nombre: string;
-}
-
-// Hook to fetch Puestos
-// Hook to fetch Despachos
