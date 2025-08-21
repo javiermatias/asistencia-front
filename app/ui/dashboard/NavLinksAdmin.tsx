@@ -33,6 +33,11 @@ const links = [
     icon: ClockIcon,
   },
   {
+    name: 'Users',
+    href: '/admin/users',
+    icon: ClockIcon,
+  },
+  {
     name: 'Bajas Empleados',
     href: '/admin/reportes/baja',
     icon: TrashIcon,
