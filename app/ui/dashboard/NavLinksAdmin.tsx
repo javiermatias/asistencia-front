@@ -6,6 +6,7 @@ import {
   UsersIcon,
   BuildingOffice2Icon,
   ClockIcon,
+  UserMinusIcon,
 } from '@heroicons/react/24/outline';
 
 import Link from 'next/link';
@@ -35,6 +36,11 @@ const links = [
     name: 'Bajas Empleados',
     href: '/admin/reportes/baja',
     icon: TrashIcon,
+  },
+  {
+    name: 'Inasistencias',
+    href: '/admin/reportes/inasistencias',
+    icon: UserMinusIcon,
   }
 
 ];
