@@ -7,7 +7,7 @@ export default async function SupervisorPage() {
       <main className="flex items-center justify-center min-h-screen bg-blue-50">
         <div className="w-full max-w-2xl p-8 space-y-4 text-center bg-white rounded-lg shadow-md">
           <h1 className="text-3xl font-bold text-blue-800">
-           Supervisor Dashboard
+           Responsable Proyecto Dashboard
           </h1>
           <p className="text-lg text-gray-700">
             Welcome, <span className="font-semibold">{session?.user?.username}</span>!

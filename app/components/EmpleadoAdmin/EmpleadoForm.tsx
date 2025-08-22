@@ -142,7 +142,7 @@ const EmpleadoForm = ({ initialData, onSuccess, onCancel, onError }: EmpleadoFor
     htmlFor="esSupervisor"
     className="ml-3 block text-base font-medium text-gray-700"
   >
-    Es Supervisor
+    Responsable Proyecto
   </label>
 </div>
       
