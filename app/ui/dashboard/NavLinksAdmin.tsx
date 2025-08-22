@@ -12,7 +12,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { TrashIcon } from 'lucide-react';
+import { ChartBarIcon, TrashIcon } from 'lucide-react';
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
 const links = [
@@ -35,7 +35,7 @@ const links = [
   {
     name: 'Users',
     href: '/admin/users',
-    icon: ClockIcon,
+    icon: UsersIcon,
   },
   {
     name: 'Bajas Empleados',
@@ -43,9 +43,9 @@ const links = [
     icon: TrashIcon,
   },
   {
-    name: 'Inasistencias',
-    href: '/admin/reportes/inasistencias',
-    icon: UserMinusIcon,
+    name: 'Reportes',
+    href: '/admin/reportes/reportes',
+    icon: ChartBarIcon,
   }
 
 ];

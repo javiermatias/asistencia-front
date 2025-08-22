@@ -22,7 +22,7 @@ export interface EmpleadoInasistencia {
       // Add other properties if they exist
   }
 
-export interface Inasistencia {
+export interface Asistencia {
     id: number;
     dia: string;
     asistio: "NO"; // This will always be "NO" for this endpoint

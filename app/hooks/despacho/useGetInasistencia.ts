@@ -1,10 +1,11 @@
 
 
-import { Inasistencia } from '@/app/types/empleado/inasistencia';
+
+import { Asistencia } from '@/app/types/empleado/inasistencia';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/asistencia`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/estadisticas`;
 
 /**
  * Fetches the absence report from the API for a given date range.
@@ -17,8 +18,8 @@ const fetchInasistenciasPorRango = async (
   token: string,
   startDate: string,
   endDate: string
-): Promise<Inasistencia[]> => {
-  const { data } = await axios.get(`${API_URL}/inasistencias-por-rango`, {
+): Promise<Asistencia[]> => {
+  const { data } = await axios.get(`${API_URL}/inasistencia`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -43,7 +44,7 @@ export const useGetInasistencias = (
   startDate: string,
   endDate: string
 ) => {
-  return useQuery<Inasistencia[], Error>({
+  return useQuery<Asistencia[], Error>({
     // The query key is an array that uniquely identifies this query.
     // It will refetch automatically when startDate or endDate changes.
     queryKey: ['inasistencias', startDate, endDate],
