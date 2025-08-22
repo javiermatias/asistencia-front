@@ -9,7 +9,7 @@ import { Asistencia } from '@/app/types/empleado/inasistencia';
 
 // --- Configuration for the select dropdown ---
 const REPORT_OPTIONS: { value: ReportType; label: string }[] = [
-  { value: 'inasistencia', label: 'Inasistencias' },
+  { value: 'inasistencias', label: 'Inasistencias' },
   { value: 'asistencias', label: 'Asistencias' },
   { value: 'descansos', label: 'Descansos' },
   { value: 'tardes', label: 'Llegadas Tarde' },
@@ -32,7 +32,7 @@ export default function EstadisticasReportPage() {
   const token = session?.user.access_token;
 
   // --- State for Filters ---
-  const [reportType, setReportType] = useState<ReportType>('inasistencia');
+  const [reportType, setReportType] = useState<ReportType>('inasistencias');
   const [startDate, setStartDate] = useState(getTodayISOString());
   const [endDate, setEndDate] = useState(getTodayISOString());
   const [empleadoFilter, setEmpleadoFilter] = useState('');

@@ -1,6 +1,7 @@
 import { Despacho, Puesto } from "../despacho";
 
 export interface EmpleadoDTO {
+    horarios: any;
     id:string;
     numero_empleado: string;
     nombre: string;

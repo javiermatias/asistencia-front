@@ -98,7 +98,7 @@ export default function UsersPage() {
                       >
                         Edit
                       </button>
-                      <button
+                 {/*      <button
                         onClick={() => handleDeleteClick(user.id)}
                         className={`px-3 py-1 rounded text-white transition ${
                           deleteMutation.isPending 
@@ -108,7 +108,7 @@ export default function UsersPage() {
                         disabled={deleteMutation.isPending}
                       >
                         {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-                      </button>
+                      </button> */}
                     </div>
                   </td>
                 </tr>
