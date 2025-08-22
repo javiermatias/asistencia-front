@@ -15,10 +15,10 @@ export default async function SupervisorPage() {
           <p className="text-gray-600">
             Your role is: <span className="font-mono text-blue-600">{session?.user?.role}</span>
           </p>
-          <div className="p-4 mt-4 text-left bg-gray-100 rounded">
+        {/*   <div className="p-4 mt-4 text-left bg-gray-100 rounded">
             <h3 className="font-semibold">Your Backend JWT:</h3>
             <p className="text-xs break-all text-gray-600">{session?.user?.access_token}</p>
-          </div>
+          </div> */}
           {/* <SignOutButton /> */}
         </div>
       </main>
