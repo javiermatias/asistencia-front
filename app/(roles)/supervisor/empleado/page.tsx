@@ -39,7 +39,7 @@ export default function SupervisorEmpleadoPage() {
   
     return (
       <main className="container mx-auto p-4">
-        <EmpleadoSupervisor initialData={despacho} />
+        <EmpleadoSupervisor despacho={despacho} />
       </main>
     );
   

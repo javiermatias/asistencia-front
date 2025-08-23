@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import { FaEdit, FaTable, FaTrash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-
+import { useQueryClient } from '@tanstack/react-query';
 // === MODIFIED: Import the new hook and remove the old one ===
 import { useDeleteEmpleado, useGetEmpleadosByDespacho } from '@/app/hooks/despacho/useEmpleado';
 import { CreateEmpleadoDTO } from '@/app/types/empleado/create-empleado';
@@ -14,17 +14,17 @@ import { Despacho } from '@/app/types/despacho';
 import EmpleadoSupervisorForm from './EmpleadoForm'; // Assuming this form component exists
 
 interface EmpleadoSupervisorProps {
-  initialData: Despacho; // The supervisor's despacho passed from the parent
+  despacho: Despacho; // The supervisor's despacho passed from the parent
 }
 
-export default function EmpleadoSupervisor({ initialData }: EmpleadoSupervisorProps) {
+export default function EmpleadoSupervisor({ despacho }: EmpleadoSupervisorProps) {
   // --- State Management ---
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingEmpleado, setEditingEmpleado] = useState<CreateEmpleadoDTO | null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   // --- REMOVED: Pagination State ---
   // const [page, setPage] = useState(1);
   // const [rowsPerPage, setRowsPerPage] = useState(100);
@@ -34,7 +34,7 @@ export default function EmpleadoSupervisor({ initialData }: EmpleadoSupervisorPr
   const token = session?.user.access_token;
 
   // === MODIFIED: Use the new hook to fetch employees for the supervisor's despacho ===
-  const { data: empleados = [], isLoading, isError, error } = useGetEmpleadosByDespacho(token, initialData.nombre);
+  const { data: empleados = [], isLoading, isError, error } = useGetEmpleadosByDespacho(token, despacho.nombre);
   
   const deleteMutation = useDeleteEmpleado();
 
@@ -58,15 +58,7 @@ export default function EmpleadoSupervisor({ initialData }: EmpleadoSupervisorPr
   // === MODIFIED: handleAddClick now pre-fills the despacho for the new employee ===
   const handleAddClick = () => {
     // Automatically set the despacho to the supervisor's despacho
-    setEditingEmpleado({
-      numero_empleado: '',
-      nombre: '',
-      apellido: '',
-      sexo: 'Masculino', // or some default
-      puesto: 0, // or some default
-      despacho: initialData.id, // Pre-fill the supervisor's despacho ID
-      es_supervisor: false,
-    });
+    setEditingEmpleado(null);
     setIsFormVisible(true);
     setGlobalError(null);
   };
@@ -92,6 +84,8 @@ export default function EmpleadoSupervisor({ initialData }: EmpleadoSupervisorPr
         if (result.isConfirmed) {
             deleteMutation.mutate({ id, token }, {
                 onSuccess: () => {
+                  queryClient.invalidateQueries({ queryKey: ['empleadosByDespacho', despacho.nombre] });
+                    
                     Swal.fire('¡Eliminado!', 'El empleado ha sido eliminado.', 'success');
                     setGlobalError(null);
                 },
@@ -108,6 +102,8 @@ export default function EmpleadoSupervisor({ initialData }: EmpleadoSupervisorPr
   const handleFormSuccess = () => {
     setIsFormVisible(false);
     setEditingEmpleado(null);
+    queryClient.invalidateQueries({ queryKey: ['empleadosByDespacho', despacho.nombre] });
+                    
     Swal.fire({
       title: "Empleado guardado",
       text: "El empleado se guardó correctamente",
@@ -140,7 +136,7 @@ export default function EmpleadoSupervisor({ initialData }: EmpleadoSupervisorPr
     <main className="max-w-7xl mx-auto mt-8 p-5 bg-white rounded-lg shadow">
       {/* === MODIFIED: Title now reflects the specific despacho === */}
       <h1 className="text-2xl font-bold text-gray-800 border-b border-gray-200 pb-2">
-        Empleados del Despacho: <span className="text-blue-600">{initialData.nombre}</span>
+        Empleados del Despacho: <span className="text-blue-600">{despacho.nombre}</span>
       </h1>
 
       {globalError && (
@@ -181,7 +177,7 @@ export default function EmpleadoSupervisor({ initialData }: EmpleadoSupervisorPr
           onSuccess={handleFormSuccess}
           onCancel={handleFormCancel}
           onError={handleFormError}
-          supervisorDespachoId={initialData.id}
+          supervisorDespachoId={despacho.id}
         /> 
       )}
 
