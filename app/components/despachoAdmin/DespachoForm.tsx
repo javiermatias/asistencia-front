@@ -122,7 +122,6 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
           step="any"
           value={latitud}
           onChange={(e) => setLatitud(e.target.value)}
-          required
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -136,8 +135,7 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
           type="number"
           step="any"
           value={longitud}
-          onChange={(e) => setLongitud(e.target.value)}
-          required
+          onChange={(e) => setLongitud(e.target.value)}          
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>

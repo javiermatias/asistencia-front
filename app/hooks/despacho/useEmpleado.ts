@@ -35,6 +35,30 @@ const fetchEmpleados = async (
   });
   return data;
 };
+/**
+ * Fetches all employees belonging to a specific despacho.
+ * This endpoint does not support pagination.
+ * @param token - The authentication token.
+ * @param despachoName - The name of the despacho to filter by.
+ * @returns A promise that resolves to an array of Empleado objects.
+ */
+const fetchEmpleadosByDespacho = async (
+  token: string,
+  despachoName: string
+): Promise<EmpleadoDTO[]> => {
+  // The API endpoint is /empleado/despacho and it uses a query parameter 'name'
+  const { data } = await axios.get(`${API_URL}/despacho`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      name: despachoName,
+    },
+  });
+  // Assuming the API returns the array of employees directly.
+  // If it returns { data: Empleado[] }, you would use "return data.data;"
+  return data;
+};
 
 const addEmpleado = async ({
   empleado,
@@ -170,4 +194,25 @@ export const useGetBajas = (token: string) => {
   });
 };
 
+/**
+ * React Query hook to get all employees for a given despacho.
+ * @param token - The user's authentication token.
+ * @param despachoName - The name of the despacho.
+ * @returns The result of the useQuery hook.
+ */
+export const useGetEmpleadosByDespacho = (token: string | undefined, despachoName: string | undefined) => {
+  return useQuery<EmpleadoDTO[], Error>({
+    // The query key uniquely identifies this data.
+    // It will refetch if 'despachoName' changes.
+    queryKey: ['empleadosByDespacho', despachoName],
+    
+    // The query function calls our new fetcher.
+    queryFn: () => fetchEmpleadosByDespacho(token!, despachoName!),
+    
+    // The query will only run if both the token and despachoName are provided.
+    enabled: !!token && !!despachoName,
+  });
+};
+
+// +++ END: NEW HOOK FOR SUPERVISOR +++
 
