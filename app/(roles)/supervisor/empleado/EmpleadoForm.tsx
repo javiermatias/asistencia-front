@@ -4,17 +4,20 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useAuthStore } from '@/app/store/authStore';
 import { useAddEmpleado, useUpdateEmpleado } from '@/app/hooks/despacho/useEmpleado';
 import { CreateEmpleadoDTO } from '@/app/types/empleado/create-empleado';
-import { useGetDespachos, useGetPuestos } from '@/app/hooks/despacho/useDespachos';
+// === MODIFIED: useGetDespachos is no longer needed here ===
+import { useGetPuestos } from '@/app/hooks/despacho/useDespachos';
 import { AxiosError } from 'axios';
 
 interface EmpleadoFormProps {
   initialData?: CreateEmpleadoDTO | null;
   onSuccess: () => void;
   onCancel: () => void;
-  onError: (errorMessage: string) => void; // The parent will provide this function
+  onError: (errorMessage: string) => void;
+  // +++ ADDED: New prop to receive the supervisor's despacho ID +++
+  supervisorDespachoId: number; 
 }
 
-const EmpleadoSupervisorForm = ({ initialData, onSuccess, onCancel, onError }: EmpleadoFormProps) => {
+const EmpleadoSupervisorForm = ({ initialData, onSuccess, onCancel, onError, supervisorDespachoId }: EmpleadoFormProps) => {
   const isEditMode = !!initialData;
 
   // Form state
@@ -24,54 +27,61 @@ const EmpleadoSupervisorForm = ({ initialData, onSuccess, onCancel, onError }: E
   const [sexo, setSexo] = useState<'Masculino' | 'Femenino' | 'Otro'>('Masculino');
   const [puestoId, setPuestoId] = useState('');
   const [despachoId, setDespachoId] = useState('');
-  const [esSupervisor, setEsSupervisor] = useState(false); // <-- 1. ADDED STATE
+  // --- REMOVED: State for supervisor checkbox is gone ---
+  // const [esSupervisor, setEsSupervisor] = useState(false);
 
-  // Get token from the store
   const token = useAuthStore((state) => state.session?.user.access_token);
 
-  // Use the new hooks by passing the token
+  // === MODIFIED: We only need to fetch puestos now ===
   const { data: puestos, isLoading: isLoadingPuestos } = useGetPuestos(token!);
-  const { data: despachos, isLoading: isLoadingDespachos } = useGetDespachos(token!);
-
-  // The mutation hooks are now simpler to call
+  
   const addEmpleadoMutation = useAddEmpleado();
   const updateEmpleadoMutation = useUpdateEmpleado();
 
-  // Effect to populate form data on edit
+  // === MODIFIED: Effect now handles setting the fixed despachoId in add mode ===
   useEffect(() => {
     if (isEditMode && initialData) {
+      // Edit Mode: Populate form with existing employee data
       setNumeroEmpleado(initialData.numero_empleado);
       setNombre(initialData.nombre);
       setApellido(initialData.apellido);
       setSexo(initialData.sexo);
       setPuestoId(initialData.puesto?.toString() ?? '');
       setDespachoId(initialData.despacho?.toString() ?? '');
-      setEsSupervisor(initialData.es_supervisor ?? false); // <-- 2. POPULATE ON EDIT
+    } else {
+      // Add Mode: Set the despachoId from the prop and reset other fields
+      setDespachoId(supervisorDespachoId.toString());
+      setNumeroEmpleado('');
+      setNombre('');
+      setApellido('');
+      setSexo('Masculino');
+      setPuestoId('');
     }
-  }, [initialData, isEditMode]);
+  }, [initialData, isEditMode, supervisorDespachoId]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!token) return; // Guard clause
+    if (!token) return;
 
     const empleadoData = {
-      id: numeroEmpleado,
+      id: numeroEmpleado, // Used for update, ignored for create
       numero_empleado: numeroEmpleado,
       nombre,
       apellido,
       sexo,
       puesto: parseInt(puestoId, 10),
       despacho: parseInt(despachoId, 10),
-      es_supervisor: esSupervisor, // <-- 3. USE STATE IN SUBMISSION
+      // === MODIFIED: es_supervisor is now hardcoded to false ===
+      es_supervisor: false,
     };
+
     const mutationOptions = {
-      onSuccess, // This is a shorthand for onSuccess: onSuccess
+      onSuccess,
       onError: (error: unknown) => {
         let errorMessage = 'Ocurrió un error inesperado.';
         if (error instanceof AxiosError) {
           errorMessage = error.response?.data?.message || errorMessage;
         }
-        // Call the parent's error handler
         onError(errorMessage);
       },
     };
@@ -79,33 +89,23 @@ const EmpleadoSupervisorForm = ({ initialData, onSuccess, onCancel, onError }: E
     if (isEditMode) {
       updateEmpleadoMutation.mutate({ empleado: empleadoData, token }, mutationOptions);
     } else {
-      addEmpleadoMutation.mutate({ empleado: { ...empleadoData, numero_empleado: numeroEmpleado }, token }, mutationOptions);
+      addEmpleadoMutation.mutate({ empleado: empleadoData, token }, mutationOptions);
     }
   };
 
   const isLoading = addEmpleadoMutation.isPending || updateEmpleadoMutation.isPending;
-  const mutationError = addEmpleadoMutation.error || updateEmpleadoMutation.error;
 
   return (
     <form onSubmit={handleSubmit} className="p-5 border border-gray-300 rounded-lg mb-6 bg-gray-50">
       <h2 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2 mb-4">
         {isEditMode ? 'Editar Empleado' : 'Agregar Empleado'}
       </h2>
-
-      {mutationError && (
-        <div className="mb-4 text-red-700 bg-red-100 border border-red-400 p-3 rounded">
-          {/* @ts-ignore */}
-          Error: {mutationError.response?.data?.message || mutationError.message}
-        </div>
-      )}
-
-      {/* Número Empleado */}
+      
+      {/* Fields for Numero Empleado, Nombre, Apellido, Sexo remain the same */}
       <div className="mb-4">
         <label htmlFor="numeroEmpleado" className="block mb-1 font-medium text-gray-700">Número de Empleado</label>
         <input id="numeroEmpleado" type="text" value={numeroEmpleado} onChange={(e) => setNumeroEmpleado(e.target.value)} required disabled={isEditMode} className={`w-full px-3 py-2 border border-gray-300 rounded ${isEditMode ? 'bg-gray-200 cursor-not-allowed' : ''}`} />
       </div>
-
-      {/* Nombre, Apellido, Sexo */}
       <div className="mb-4"><label htmlFor="nombre" className="block mb-1 font-medium text-gray-700">Nombre</label><input id="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded"/></div>
       <div className="mb-4"><label htmlFor="apellido" className="block mb-1 font-medium text-gray-700">Apellido</label><input id="apellido" type="text" value={apellido} onChange={(e) => setApellido(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded"/></div>
       <div className="mb-4"><label htmlFor="sexo" className="block mb-1 font-medium text-gray-700">Sexo</label><select id="sexo" value={sexo} onChange={(e) => setSexo(e.target.value as 'Masculino' | 'Femenino' | 'Otro')} required className="w-full px-3 py-2 border border-gray-300 rounded"><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option><option value="Otro">Otro</option></select></div>
@@ -119,34 +119,10 @@ const EmpleadoSupervisorForm = ({ initialData, onSuccess, onCancel, onError }: E
         </select>
       </div>
 
-      {/* Despacho Select */}
-      <div className="mb-4">
-        <label htmlFor="despacho" className="block mb-1 font-medium text-gray-700">Despacho</label>
-        <select id="despacho" value={despachoId} onChange={(e) => setDespachoId(e.target.value)} required className="w-full px-3 py-2 border border-ray-300 rounded" disabled={isLoadingDespachos}>
-          <option value="" disabled>{isLoadingDespachos ? 'Cargando...' : 'Seleccione un despacho'}</option>
-          {despachos?.map((despacho) => (<option key={despacho.id} value={despacho.id}>{despacho.nombre}</option>))}
-        </select>
-      </div>
-
-
-     {/* Supervisor Checkbox */}
-<div className="mb-4 flex items-center">
-  <input
-    id="esSupervisor"
-    type="checkbox"
-    checked={esSupervisor}
-    onChange={(e) => setEsSupervisor(e.target.checked)}
-    className="h-6 w-6 scale-125 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-  />
-  <label
-    htmlFor="esSupervisor"
-    className="ml-3 block text-base font-medium text-gray-700"
-  >
-    Responsable Proyecto
-  </label>
-</div>
+      {/* --- REMOVED: Despacho Select is gone --- */}
       
-
+      {/* --- REMOVED: Supervisor Checkbox is gone --- */}
+      
       {/* Buttons */}
       <div className="flex gap-3 mt-6">
         <button type="submit" disabled={isLoading} className={`px-4 py-2 rounded text-white transition ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}>

@@ -181,6 +181,7 @@ export default function EmpleadoSupervisor({ initialData }: EmpleadoSupervisorPr
           onSuccess={handleFormSuccess}
           onCancel={handleFormCancel}
           onError={handleFormError}
+          supervisorDespachoId={initialData.id}
         /> 
       )}
 

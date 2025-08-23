@@ -225,6 +225,7 @@ export default function EmpleadoPage() {
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Puesto</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Despacho</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Sexo</th>
+                <th className="p-3 text-center text-sm font-semibold text-gray-600 border-b">Responsable</th>
                 <th className="p-3 text-center text-sm font-semibold text-gray-600 border-b">Horario</th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Acciones</th>
               </tr>
@@ -244,6 +245,17 @@ export default function EmpleadoPage() {
                     <td className="p-3 border-b text-sm">{empleado.despacho?.nombre ?? 'N/A'}</td>
                     <td className="p-3 border-b text-sm">{empleado.sexo}</td>
                     <td className="p-3 border-b text-sm text-center">
+                    
+                    <span
+                     className={`px-2 py-1 text-xs rounded-full ${
+                     empleado.es_supervisor ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                     }`}>
+                     {empleado.es_supervisor? 'Sí' : 'No'}
+                    </span>
+                    </td>
+                    
+                    <td className="p-3 border-b text-sm text-center">
+                    
                     <span
                      className={`px-2 py-1 text-xs rounded-full ${
                      empleado.horarios.length > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
