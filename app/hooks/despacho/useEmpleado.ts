@@ -190,7 +190,7 @@ export const useGetBajas = (token: string) => {
     queryKey: ['empleadosBajas'],
     queryFn: () => fetchBajas(token),
     enabled: !!token, // The query will only run if the token exists
-    staleTime: 1000 * 60 * 5, // Optional: Cache data for 5 minutes
+    //staleTime: 1000 * 60 * 5, // Optional: Cache data for 5 minutes
   });
 };
 
