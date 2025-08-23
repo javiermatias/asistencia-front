@@ -235,13 +235,13 @@ export default function EmpleadoSupervisor({ despacho }: EmpleadoSupervisorProps
                         >
                           <FaEdit/>
                         </button>
-                        <button
+                      {/*   <button
                            onClick={() => router.push(`/admin/horario/${empleado.id}?nombre=${empleado.nombre}&apellido=${empleado.apellido}&nroEmpleado=${empleado.numero_empleado}`)}
                            title="Editar Horario"
                            className="px-3 py-1 rounded text-white transition text-sm bg-cyan-500 hover:bg-cyan-600"
                         >
                           <FaTable/>
-                        </button>
+                        </button> */}
                         <button
                           onClick={() => handleDeleteClick(empleado.numero_empleado + " " + empleado.apellido + " " + empleado.nombre,empleado.id.toString())}
                           className={`px-3 py-1 rounded text-white transition text-sm ${
