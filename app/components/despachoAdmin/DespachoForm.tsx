@@ -52,13 +52,19 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const despachoData = {
+  
+    const despachoData: any = {
       nombre: nombre,
-      latitud: parseFloat(latitud),
-      longitud: parseFloat(longitud),
-      
     };
-
+  
+    if (latitud) {
+      despachoData.latitud = parseFloat(latitud);
+    }
+  
+    if (longitud) {
+      despachoData.longitud = parseFloat(longitud);
+    }
+  
     if (initialData) {
       updateDespachoMutation.mutate(
         {
@@ -75,7 +81,8 @@ const DespachoForm = ({ initialData, onSuccess, onCancel }: DespachoFormProps) =
         },
         { onSuccess }
       );
-    }  };
+    }
+  };
 
   const mutation = initialData ? updateDespachoMutation : addDespachoMutation;
   const isLoading = mutation.isPending;
