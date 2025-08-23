@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { lusitana } from '@/app/ui/fonts';
 import { signIn } from 'next-auth/react';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { Eye, EyeOff } from 'lucide-react';
 export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -73,21 +75,29 @@ export default function LoginForm() {
               required
             />
           </div>
-
           <div className="mb-4">
-            <label htmlFor="password" className="block mb-1 font-medium text-gray-700">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              className="w-full rounded border border-gray-300 p-2"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+  <label htmlFor="password" className="block mb-1 font-medium text-gray-700">
+    Contraseña
+  </label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      id="password"
+      className="w-full rounded border border-gray-300 p-2 pr-10" // 👈 add padding-right for icon
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      required
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword((prev) => !prev)}
+      className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+    >
+      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  </div>
+</div>
 
           {errorMessage && (
             <div className="text-red-600 text-sm mt-2 text-center">{errorMessage}</div>
