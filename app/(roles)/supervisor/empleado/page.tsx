@@ -1,11 +1,10 @@
+'use client'
 import { useAuthStore } from "@/app/store/authStore";
 import EmpleadoSupervisor from "./Empleado";
 import { useGetDespachoBySupervisor } from "@/app/hooks/despacho/useDespachos";
 
-export default async function SupervisorEmpleadoPage() {
-    //const session = await auth();
-    //console.log(session);
-  
+export default function SupervisorEmpleadoPage() {
+    
     const { session } = useAuthStore();
     const token = session?.user.access_token;
     
