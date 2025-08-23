@@ -5,6 +5,7 @@ import {
   DocumentDuplicateIcon,
   BuildingOffice2Icon,
   ClockIcon,
+  UsersIcon,
 } from '@heroicons/react/24/outline';
 
 import Link from 'next/link';
@@ -24,6 +25,11 @@ const links = [
     name: 'Horarios',
     href: '/supervisor/horarios',
     icon: ClockIcon,
+  },
+  {
+    name: 'Empleados',
+    href: '/supervisor/empleado',
+    icon: UsersIcon,
   }
 
 ];
