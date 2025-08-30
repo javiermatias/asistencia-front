@@ -15,7 +15,7 @@ interface DailyReport {
 }
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/estadisticas`;
-
+const API_URL_BY_DESPACHO = `${process.env.NEXT_PUBLIC_API_URL}/estadisticas/despacho`;
 const fetchDailyReport = async (token: string, reportDateString: string): Promise<DailyReport> => {
     const { data } = await axios.get(API_URL, {
       headers: {
@@ -41,5 +41,38 @@ const fetchDailyReport = async (token: string, reportDateString: string): Promis
       queryKey: ['dailyReport', reportDate],
       queryFn: () => fetchDailyReport(token, reportDate),
       enabled: !!token && !!reportDate,
+    });
+  };
+
+
+  const fetchDailyReportByDespacho = async (
+    token: string,
+    reportDateString: string,
+    idDespacho: number,
+  ): Promise<DailyReport> => {
+    const { data } = await axios.get(`${API_URL_BY_DESPACHO}/${idDespacho}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        reportDate: reportDateString,
+      },
+    });
+    return data;
+  };
+  
+  /**
+   * Custom hook to get the daily report scoped to a despacho.
+   */
+  export const useGetDailyReportByDespacho = (
+    token: string,
+    reportDate: string,
+    idDespacho?: number,
+  ) => {
+    return useQuery<DailyReport, Error>({
+      queryKey: ['dailyReportByDespacho', reportDate, idDespacho],
+      queryFn: () =>
+        fetchDailyReportByDespacho(token, reportDate, idDespacho as number),
+      enabled: !!token && !!reportDate && !!idDespacho, // only run when all are present
     });
   };

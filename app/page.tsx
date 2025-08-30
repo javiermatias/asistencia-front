@@ -56,7 +56,7 @@ export default function Page() {
           router.push('/admin/dashboard');
           break;
         case 'supervisor':
-          router.push('/supervisor');
+          router.push('/supervisor/dashboard');
           break;
         case 'agente':
           router.push('/agente');
