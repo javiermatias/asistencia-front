@@ -6,6 +6,7 @@ import {
   BuildingOffice2Icon,
   ClockIcon,
   UsersIcon,
+  ChartBarIcon,
 } from '@heroicons/react/24/outline';
 
 import Link from 'next/link';
@@ -31,6 +32,11 @@ const links = [
     name: 'Empleados',
     href: '/supervisor/empleado',
     icon: UsersIcon,
+  },
+  {
+    name: 'Reportes',
+    href: '/supervisor/reportes',
+    icon: ChartBarIcon,
   }
 
 ];
