@@ -25,7 +25,7 @@ export default function EmpleadoPage() {
 
   // Pagination State
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [rowsPerPage, setRowsPerPage] = useState(1000);
 
   // --- Auth and Data Fetching ---
   const { session } = useAuthStore();
