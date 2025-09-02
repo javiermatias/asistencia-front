@@ -49,7 +49,7 @@ export default function EstadisticasReportPage() {
   // --- Dynamic titles and labels ---
   const reportTitle = REPORT_OPTIONS.find(opt => opt.value === reportType)?.label || 'Reporte';
   const dateColumnTitle = reportType.includes('inasistencia') || reportType.includes('faltas') 
-    ? `Fecha de Falla` 
+    ? `Fecha de Falta` 
     : `Fecha de Registro`;
 
   // --- Filtering Logic with useMemo for performance ---
@@ -165,10 +165,10 @@ export default function EstadisticasReportPage() {
                 ) : filteredData.length > 0 ? (
                   filteredData.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="p-3 border-b text-sm">{`${item.empleado.nombre} ${item.empleado.apellido}`}</td>
-                      <td className="p-3 border-b text-sm">{item.turno.nombre}</td>
+                      <td className="p-3 border-b text-sm">{`${item?.empleado?.nombre} ${item?.empleado?.apellido}`}</td>
+                      <td className="p-3 border-b text-sm">{item?.turno?.nombre}</td>
                       {/* NEW: Table cell for despacho. Uses optional chaining and nullish coalescing for safety. */}
-                      <td className="p-3 border-b text-sm">{item.despacho?.nombre ?? 'N/A'}</td>
+                      <td className="p-3 border-b text-sm">{item?.despacho?.nombre ?? 'N/A'}</td>
                       <td className="p-3 border-b text-sm">
                         {new Date(item.dia + 'T00:00:00').toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </td>
