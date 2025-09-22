@@ -7,6 +7,7 @@ import {
   BuildingOffice2Icon,
   ClockIcon,
   UserMinusIcon,
+  TableCellsIcon,
 } from '@heroicons/react/24/outline';
 
 import Link from 'next/link';
@@ -46,6 +47,11 @@ const links = [
     name: 'Reportes',
     href: '/admin/reportes/reportes',
     icon: ChartBarIcon,
+  },
+  {
+    name: 'Excel',
+    href: '/admin/reportes/excel',
+    icon: TableCellsIcon,
   }
 
 ];

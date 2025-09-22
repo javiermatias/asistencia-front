@@ -54,12 +54,17 @@ interface ProtectedRoleLayoutProps {
     }
   
     return (
-      <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
-        <div className="w-full flex-none md:w-64">
-          {/* 4. Render the component if it exists */}
+      // note: min-h-0 here prevents children flex items from overflowing unexpectedly
+      <div className="flex h-screen min-h-0 flex-col md:flex-row">
+        {/* Sidebar */}
+        <aside className="w-full md:w-64 flex-shrink-0">
           {SideNavComponent && <SideNavComponent />}
-        </div>
-        <div className="flex-grow p-6 md:overflow-y-auto md:p-2">{children}</div>
+        </aside>
+  
+        {/* Main content: allow independent scrolling */}
+        <main className="flex-1 min-h-0 overflow-y-auto p-6 md:p-2">
+          {children}
+        </main>
       </div>
     );
   }
