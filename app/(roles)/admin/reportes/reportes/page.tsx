@@ -5,6 +5,8 @@ import { useAuthStore } from '@/app/store/authStore';
 import { Loader, AlertTriangle, UserX } from 'lucide-react';
 import { ReportType, useGetReporte } from '@/app/hooks/despacho/useGetReporte';
 import { Asistencia } from '@/app/types/empleado/inasistencia';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 
 // --- Configuration for the select dropdown ---
@@ -90,6 +92,37 @@ export default function EstadisticasReportPage() {
       return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
     };
 
+    const exportToExcel = () => {
+      if (!filteredData.length) return;
+    
+      // Map your data to plain objects with column titles
+      const exportData = filteredData.map((item) => ({
+        Empleado: `${item?.empleado?.nombre} ${item?.empleado?.apellido}`,
+        Turno: item?.turno?.nombre ?? '-',
+        "Hora Ingreso": formatHour(item?.fecha_ingreso_local),
+        "Hora Egreso": formatHour(item?.fecha_egreso_local),
+        "Asistió": item.asistio,
+        "Tarde": item.tarde,
+        "Despacho": item?.despacho?.nombre ?? 'N/A',
+        [dateColumnTitle]: new Date(item.dia + 'T00:00:00').toLocaleDateString(
+          'es-MX',
+          { year: 'numeric', month: 'long', day: 'numeric' }
+        ),
+      }));
+    
+      // Convert to worksheet
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+    
+      // Create workbook
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+    
+      // Export
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+      saveAs(data, `reporte-${reportType}-${startDate}_a_${endDate}.xlsx`);
+    };
+
   return (
     <section className="pt-16 p-2">
       <div className="container mx-auto px-2">
@@ -146,9 +179,19 @@ export default function EstadisticasReportPage() {
               </button>
             </div>
           </div>
+          <div className="flex justify-start mb-4">
+          <button
+            onClick={exportToExcel}
+            disabled={!filteredData.length}
+            className="px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700 transition disabled:opacity-50"
+          >
+           Exportar a Excel
+          </button>
+          </div>
           
           {/* --- Table Section --- */}
           <div className="overflow-x-auto">
+      
           <table className="w-full min-w-[1100px] border-collapse">
               <thead>
                 <tr className="bg-gray-100">
@@ -220,7 +263,7 @@ export default function EstadisticasReportPage() {
 >
   {item.asistio}
 </td>
-                      <td className={`p-3 border-b text-sm font-bold ${item.tarde === 'SI' ? 'text-green-600' : 'text-red-600'}`}>
+                      <td className={`p-3 border-b text-sm font-bold ${item.tarde === 'NO' ? 'text-green-600' : 'text-red-600'}`}>
                         {item.tarde}
                       </td>
                       <td className="p-3 border-b text-sm">
