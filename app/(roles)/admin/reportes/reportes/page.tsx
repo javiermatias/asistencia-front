@@ -9,6 +9,7 @@ import { Asistencia } from '@/app/types/empleado/inasistencia';
 
 // --- Configuration for the select dropdown ---
 const REPORT_OPTIONS: { value: ReportType; label: string }[] = [
+  { value: 'todos', label: 'Todas' },
   { value: 'inasistencias', label: 'Inasistencias' },
   { value: 'asistencias', label: 'Asistencias' },
   { value: 'descansos', label: 'Descansos' },
@@ -32,7 +33,7 @@ export default function EstadisticasReportPage() {
   const token = session?.user.access_token;
 
   // --- State for Filters ---
-  const [reportType, setReportType] = useState<ReportType>('inasistencias');
+  const [reportType, setReportType] = useState<ReportType>('todos');
   const [startDate, setStartDate] = useState(getTodayISOString());
   const [endDate, setEndDate] = useState(getTodayISOString());
   const [empleadoFilter, setEmpleadoFilter] = useState('');
@@ -82,6 +83,13 @@ export default function EstadisticasReportPage() {
     setDespachoFilter(''); // NEW: Clear despacho filter
   };
 
+    // --- helper para obtener solo la hora ---
+    const formatHour = (dateTime: string | null) => {
+      if (!dateTime) return '-';
+      const d = new Date(dateTime);
+      return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    };
+
   return (
     <section className="pt-16 p-2">
       <div className="container mx-auto px-2">
@@ -93,6 +101,7 @@ export default function EstadisticasReportPage() {
           {/* --- Filter Controls --- */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
             <div>
+            
               <label htmlFor="reportType" className="block text-sm font-medium text-gray-700 mb-1">Tipo de Reporte</label>
               <select
                 id="reportType"
@@ -140,49 +149,102 @@ export default function EstadisticasReportPage() {
           
           {/* --- Table Section --- */}
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] border-collapse">
+          <table className="w-full min-w-[1100px] border-collapse">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Empleado</th>
-                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Turno</th>
-                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Despacho</th> {/* NEW: Table header */}
-                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">{dateColumnTitle}</th>
+                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">
+                    Empleado
+                  </th>
+                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">
+                    Turno
+                  </th>
+                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">
+                    Hora Ingreso
+                  </th>
+                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">
+                    Hora Egreso
+                  </th>
+                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">
+                    Asistió
+                  </th>
+                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">Tarde</th>
+                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">
+                    Despacho
+                  </th>
+                  <th className="p-3 text-left text-sm font-semibold text-gray-600 border-b">
+                    {dateColumnTitle}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={4} className="text-center p-6"> {/* MODIFIED: colSpan is now 4 */}
-                      <div className="flex justify-center items-center gap-2 text-gray-500"><Loader className="animate-spin" />Cargando reporte...</div>
+                    <td colSpan={7} className="text-center p-6">
+                      <div className="flex justify-center items-center gap-2 text-gray-500">
+                        <Loader className="animate-spin" />
+                        Cargando reporte...
+                      </div>
                     </td>
                   </tr>
                 ) : isError ? (
                   <tr>
-                    <td colSpan={4} className="text-center p-6 text-red-600"> {/* MODIFIED: colSpan is now 4 */}
-                      <div className="flex justify-center items-center gap-2"><AlertTriangle />Error al cargar el reporte: {error.message}</div>
+                    <td colSpan={7} className="text-center p-6 text-red-600">
+                      <div className="flex justify-center items-center gap-2">
+                        <AlertTriangle />
+                        Error al cargar el reporte: {error.message}
+                      </div>
                     </td>
                   </tr>
                 ) : filteredData.length > 0 ? (
                   filteredData.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="p-3 border-b text-sm">{`${item?.empleado?.nombre} ${item?.empleado?.apellido}`}</td>
-                      <td className="p-3 border-b text-sm">{item?.turno?.nombre}</td>
-                      {/* NEW: Table cell for despacho. Uses optional chaining and nullish coalescing for safety. */}
-                      <td className="p-3 border-b text-sm">{item?.despacho?.nombre ?? 'N/A'}</td>
                       <td className="p-3 border-b text-sm">
-                        {new Date(item.dia + 'T00:00:00').toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        {`${item?.empleado?.nombre} ${item?.empleado?.apellido}`}
+                      </td>
+                      <td className="p-3 border-b text-sm">
+                        {item?.turno?.nombre}
+                      </td>
+                      <td className="p-3 border-b text-sm">
+                        {formatHour(item?.fecha_ingreso_local)}
+                      </td>
+                      <td className="p-3 border-b text-sm">
+                        {formatHour(item?.fecha_egreso_local)}
+                      </td>
+                      <td
+                        className={`p-3 border-b text-sm font-bold ${
+                        item.asistio === 'NO' ? 'text-red-600'
+                        : item.asistio === 'SI' || item.asistio === 'Descanso'
+      ? 'text-green-600'
+      : ''
+  }`}
+>
+  {item.asistio}
+</td>
+                      <td className={`p-3 border-b text-sm font-bold ${item.tarde === 'SI' ? 'text-green-600' : 'text-red-600'}`}>
+                        {item.tarde}
+                      </td>
+                      <td className="p-3 border-b text-sm">
+                        {item?.despacho?.nombre ?? 'N/A'}
+                      </td>
+                      <td className="p-3 border-b text-sm">
+                        {new Date(item.dia + 'T00:00:00').toLocaleDateString(
+                          'es-MX',
+                          { year: 'numeric', month: 'long', day: 'numeric' }
+                        )}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="text-center text-gray-500 p-6"> {/* MODIFIED: colSpan is now 4 */}
-                       <div className="flex flex-col items-center gap-2">
-                         <UserX size={32} />
-                         <span>
-                            {reporteData && reporteData.length > 0 ? 'No se encontraron resultados para los filtros aplicados.' : 'No hay datos en el rango de fechas seleccionado.'}
-                         </span>
-                       </div>
+                    <td colSpan={7} className="text-center text-gray-500 p-6">
+                      <div className="flex flex-col items-center gap-2">
+                        <UserX size={32} />
+                        <span>
+                          {reporteData && reporteData.length > 0
+                            ? 'No se encontraron resultados para los filtros aplicados.'
+                            : 'No hay datos en el rango de fechas seleccionado.'}
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 )}

@@ -5,6 +5,7 @@ import axios from 'axios';
 
 // Define the possible report types for type safety
 export type ReportType =
+  | 'todos'
   | 'asistencias'
   | 'inasistencias'
   | 'descansos'

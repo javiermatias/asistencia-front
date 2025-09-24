@@ -25,8 +25,8 @@ export interface EmpleadoInasistencia {
 export interface Asistencia {
     id: number;
     dia: string;
-    asistio: "NO"; // This will always be "NO" for this endpoint
-    tarde: "NO";
+    asistio: "NO" | "SI"; // This will always be "NO" for this endpoint
+    tarde: "NO" | "SI";
     fecha_ingreso: string | null;
     fecha_egreso: string | null;
     fecha_ingreso_local: string | null;
